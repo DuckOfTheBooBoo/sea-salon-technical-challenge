@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ref, ref, onBeforeMount, watchEffect } from 'vue'
+import { Ref, ref, onBeforeMount, watchEffect, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useField, FieldContext } from 'vee-validate'
 
@@ -22,18 +22,23 @@ const { value: rating, validate }: FieldContext<ValueType> = useField('rating', 
 
 const setRating = (stars: number): void => {
   ratingStar.value = stars
-  rating.value = ratingStar.value
+  rating.value = stars
   validate()
 }
 
 onBeforeMount(() => {
-  if (props.modelValue >= 1) {
-    setRating(props.modelValue)
-  }
+  console.log(props.modelValue)
+  setRating(props.modelValue)
 })
 
 watchEffect(() => {
   ratingStar.value = props.modelValue
+})
+
+onMounted(() => {
+  console.log('REF: ', ratingStar.value)
+  console.log('MODEL: ', props.modelValue)
+  console.log('FORM: ', rating.value)
 })
 </script>
 
@@ -42,6 +47,7 @@ watchEffect(() => {
     <Icon 
       :class="['text-2xl', star <= rating ? 'text-yellow-400' : '']"
       v-for="star in stars"
+      :key="star"
       :icon="star <= rating ? 'radix-icons:star-filled' : 'radix-icons:star'"
       @click="isWriteable ? setRating(star) : null"
     />
