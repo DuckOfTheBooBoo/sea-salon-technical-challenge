@@ -1,7 +1,22 @@
 <script setup lang="ts">
 import ServiceCard from "@/components/ServiceCard.vue";
+import {
+  CalendarDate,
+  DateFormatter,
+  getLocalTimeZone,
+  parseDate,
+  today,
+} from "@internationalized/date";
+import { toDate } from "radix-vue/date";
+import { Calendar as CalendarIcon } from "lucide-vue-next";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Icon } from "@iconify/vue";
-import { Ref, ref } from "vue";
+import { Ref, ref, computed } from "vue";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import * as z from "zod";
@@ -17,16 +32,32 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input, StarRating } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Toaster from "@/components/ui/toast/Toaster.vue";
 import Review from "@/components/Review.vue";
 import { useToast } from "@/components/ui/toast/use-toast";
+import { cn } from "@/lib/utils";
 
 interface Service {
   src: string;
@@ -58,30 +89,62 @@ const reviewForm = useForm({
   validationSchema: reviewFormSchema,
 });
 
+// Reservation
+const df = new DateFormatter("en-US", {
+  dateStyle: "long",
+});
+
+const placeholder = ref();
+
+const reservationFormSchema = toTypedSchema(
+  z.object({
+    name: z.string().min(1, { message: "Name is required" }),
+    phoneNumber: z.string().min(1, { message: "Phone number is required" }),
+    service: z.string().min(1, { message: "Service is required" }),
+    date: z.string().date().min(1, { message: "Date is required" }),
+    time: z.string().min(1, { message: "Time is required" }),
+  })
+);
+
+const reservationForm = useForm({
+  validationSchema: reservationFormSchema,
+});
+
+const dateValue = computed({
+  get: () => (reservationForm.values.date ? parseDate(reservationForm.values.date) : undefined),
+  set: (val) => val,
+});
+
+const availableTime = computed(() => Array.from({ length: 20 - 9 + 1 }, (_, i) => i + 9));
+
+const isReservationFormOpen: Ref<boolean> = ref(false);
+
+// Service list
 const services: Service[] = [
   {
     src: "src/assets/images/haircut-img-comp.webp",
     src2: undefined,
     title: "Haircut",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "Expert cuts that flatter you. Effortless style for every occasion.",
   },
   {
     src: "src/assets/images/manicure-img-comp.webp",
     src2: "src/assets/images/pedicure-img-comp.webp",
     title: "Manicure & Pedicure",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "Indulge in luxurious manicures & pedicures. Flawless polish, lasting confidence.",
   },
   {
     src: "src/assets/images/facial-img-comp.webp",
     src2: undefined,
     title: "Facial Treatment",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "Revive & restore your skin. Personalized treatments for a radiant you.",
   },
 ];
 
+// Temporary reviews array state
 const reviews: Ref<ReviewType[]> = ref([
   {
     name: "Emily Johnson",
@@ -115,7 +178,7 @@ const reviews: Ref<ReviewType[]> = ref([
   },
 ]);
 
-const onSubmit = reviewForm.handleSubmit((values) => {
+const onReviewSubmit = reviewForm.handleSubmit((values) => {
   const newReview: ReviewType = {
     name: values.name,
     rating: values.rating,
@@ -128,10 +191,188 @@ const onSubmit = reviewForm.handleSubmit((values) => {
   });
   reviewForm.resetForm();
 });
+
+const onReservationSubmit = reservationForm.handleSubmit((values) => {
+  console.log(values);
+  toast({
+    title: "Success!",
+    description: "Your review has been submitted",
+  });
+  reservationForm.resetForm();
+  isReservationFormOpen.value = false;
+});
 </script>
 
 <template>
   <Toaster />
+
+  <nav class="flex justify-between p-3">
+    <div class="flex gap-5">
+      <span>SEA Salon</span>
+      <a href="#services">Our Services</a>
+      <a href="#reviews">Testimonials</a>
+    </div>
+
+    <div>
+      <Dialog v-model:open="isReservationFormOpen">
+        <DialogTrigger as-child>
+          <Button>Make a Reservation</Button>
+        </DialogTrigger>
+        <DialogContent>
+          <form @submit.prevent="onReservationSubmit">
+            <DialogHeader>
+              <DialogTitle>Reservation Form</DialogTitle>
+            </DialogHeader>
+            <FormField v-slot="{ componentField }" name="name">
+              <FormItem>
+                <FormLabel>Your name</FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="Enter your full name here"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormDescription
+                  >This will be your reservation name.</FormDescription
+                >
+                <FormMessage class="text-xs h-4" />
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="phoneNumber">
+              <FormItem>
+                <FormLabel>Your active phone number</FormLabel>
+                <FormControl>
+                  <Input
+                    type="tel"
+                    placeholder="Enter your active phone number here"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormDescription
+                  >This will be your phone number.</FormDescription
+                >
+                <FormMessage class="text-xs h-4" />
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="service">
+              <FormItem>
+                <FormLabel>Service type</FormLabel>
+                <Select v-bind="componentField">
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a service" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Services</SelectLabel>
+                      <SelectItem value="hairstyle">
+                        Haircut & styling
+                      </SelectItem>
+                      <SelectItem value="manipedi">
+                        Manicure & pedicure
+                      </SelectItem>
+                      <SelectItem value="facial">
+                        Facial treatments
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormDescription
+                  >This will be the service you want to
+                  reserve.</FormDescription
+                >
+                <FormMessage class="text-xs h-4" />
+              </FormItem>
+            </FormField>
+            <div class="flex">
+              <!-- DATE -->
+              <FormField name="date">
+                <FormItem>
+                  <FormLabel>Reservation date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger as-child>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          :class="
+                            cn(
+                              'w-[240px] ps-3 text-start font-normal',
+                              !dateValue && 'text-muted-foreground'
+                            )
+                          "
+                        >
+                          <span>{{
+                            dateValue
+                              ? df.format(toDate(dateValue))
+                              : "Pick a date"
+                          }}</span>
+                          <CalendarIcon class="ms-auto h-4 w-4 opacity-50" />
+                        </Button>
+                        <input hidden />
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent class="w-auto p-0">
+                      <Calendar
+                        v-model:placeholder="placeholder"
+                        v-model="dateValue"
+                        calendar-label="Reservation Date"
+                        initial-focus
+                        :min-value="today(getLocalTimeZone())"
+                        @update:model-value="
+                          (v) => {
+                            if (v) {
+                              reservationForm.setFieldValue('date', v.toString());
+                            } else {
+                              reservationForm.setFieldValue('date', undefined);
+                            }
+                          }
+                        "
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription class="w-fit"
+                    >This will be your reservation date.</FormDescription
+                  >
+                  <FormMessage class="text-xs h-4" />
+                </FormItem>
+              </FormField>
+
+              <!-- TIME -->
+              <FormField v-slot="{ componentField }" name="time">
+                <FormItem>
+                  <FormLabel>Time</FormLabel>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select time" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem v-for="hour in availableTime" :value="`${hour}:00`" :key="hour">
+                          {{ `${hour}:00` }}
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription
+                    >This will be reservation time.</FormDescription
+                  >
+                  <FormMessage class="text-xs h-4" />
+                </FormItem>
+              </FormField>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Submit</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  </nav>
+
   <div class="flex w-screen h-screen justify-center items-center">
     <div class="bg-white flex flex-col w-[50%] justify-center">
       <p class="text-8xl text-center font-semibold">SEA Salon</p>
@@ -145,8 +386,9 @@ const onSubmit = reviewForm.handleSubmit((values) => {
       />
     </div>
   </div>
-  <div class="my-2">
-    <h1 class="text-center text-4xl mb-3 font-semibold">Our Services</h1>
+
+  <div class="my-2" id="services">
+    <h1 class="text-center text-4xl my-10 font-semibold">Our Services</h1>
     <div class="flex gap-10 px-2 justify-center">
       <ServiceCard
         v-for="service in services"
@@ -160,13 +402,13 @@ const onSubmit = reviewForm.handleSubmit((values) => {
   </div>
 
   <!-- Review -->
-  <div class="h-[530px] m-h-[530px]">
-    <h1 class="text-center text-4xl mb-3 font-semibold">
+  <div class="h-[530px] m-h-[530px]" id="reviews">
+    <h1 class="text-center text-4xl my-10 font-semibold">
       What Others Said About Us
     </h1>
     <div class="flex px-32 w-full justify-between gap-4">
       <Card class="w-2/3">
-        <form @submit="onSubmit">
+        <form @submit="onReviewSubmit">
           <CardHeader>
             <CardTitle>Leave a review</CardTitle>
           </CardHeader>
