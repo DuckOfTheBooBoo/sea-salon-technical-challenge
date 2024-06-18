@@ -1,8 +1,11 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"log"
+
+	"github.com/DuckOfTheBooBoo/sea-salon-technical-challenge/backend/configs"
 	"github.com/DuckOfTheBooBoo/sea-salon-technical-challenge/backend/utils"
+	"github.com/gin-gonic/gin"
 )
 
 func init() {
@@ -11,6 +14,14 @@ func init() {
 
 func main() {
 	r := gin.Default()
+
+	// Set up database connection
+	_, err := configs.ConnectToDB()
+
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 
 	// Define root endpoint
 	api := r.Group("/api")
