@@ -58,6 +58,8 @@ import Toaster from "@/components/ui/toast/Toaster.vue";
 import Review from "@/components/Review.vue";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { cn } from "@/lib/utils";
+import { addReservation } from '@/service/reservationApi';
+import { ReservationRequest } from "@/types";
 
 interface Service {
   src: string;
@@ -111,11 +113,16 @@ const reservationForm = useForm({
 });
 
 const dateValue = computed({
-  get: () => (reservationForm.values.date ? parseDate(reservationForm.values.date) : undefined),
+  get: () =>
+    reservationForm.values.date
+      ? parseDate(reservationForm.values.date)
+      : undefined,
   set: (val) => val,
 });
 
-const availableTime = computed(() => Array.from({ length: 20 - 9 + 1 }, (_, i) => i + 9));
+const availableTime = computed(() =>
+  Array.from({ length: 20 - 9 + 1 }, (_, i) => i + 9)
+);
 
 const isReservationFormOpen: Ref<boolean> = ref(false);
 
@@ -192,15 +199,33 @@ const onReviewSubmit = reviewForm.handleSubmit((values) => {
   reviewForm.resetForm();
 });
 
-const onReservationSubmit = reservationForm.handleSubmit((values) => {
-  console.log(values);
-  toast({
-    title: "Success!",
-    description: "Your review has been submitted",
-  });
-  reservationForm.resetForm();
-  isReservationFormOpen.value = false;
-});
+const onReservationSubmit = reservationForm.handleSubmit(async (values): Promise<void> => {
+    // Construct the request body
+    const requestBody: ReservationRequest = {
+      full_name: values.name,
+      phoneNumber: values.phoneNumber,
+      service: values.service,
+      date: values.date,
+      time: values.time,
+    };
+
+    try {
+      const responseData = await addReservation(requestBody);
+      toast({
+        title: "Success!",
+        description: "Your reservation has been submitted",
+      });
+      reservationForm.resetForm();
+      isReservationFormOpen.value = false;
+    } catch (error: unknown) {
+      const err = error as Error;
+      toast({
+        title: "Something went wrong!",
+        description: err.message,
+      });
+    }
+  }
+);
 </script>
 
 <template>
@@ -323,7 +348,10 @@ const onReservationSubmit = reservationForm.handleSubmit((values) => {
                         @update:model-value="
                           (v) => {
                             if (v) {
-                              reservationForm.setFieldValue('date', v.toString());
+                              reservationForm.setFieldValue(
+                                'date',
+                                v.toString()
+                              );
                             } else {
                               reservationForm.setFieldValue('date', undefined);
                             }
@@ -351,14 +379,17 @@ const onReservationSubmit = reservationForm.handleSubmit((values) => {
                     </FormControl>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem v-for="hour in availableTime" :value="`${hour}:00`" :key="hour">
+                        <SelectItem
+                          v-for="hour in availableTime"
+                          :value="`${hour}:00`"
+                          :key="hour"
+                        >
                           {{ `${hour}:00` }}
                         </SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                  <FormDescription
-                    >This will be reservation time.</FormDescription
+                  <FormDescription>Each reservation is one hour long.</FormDescription
                   >
                   <FormMessage class="text-xs h-4" />
                 </FormItem>
