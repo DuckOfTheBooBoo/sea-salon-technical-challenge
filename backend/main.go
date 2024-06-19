@@ -41,6 +41,7 @@ func main() {
 
 	//Register routes
 	routes.ReservationRoute(api)
+	routes.ReviewRoute(api)
 
 	r.Run(":3000")
 }
