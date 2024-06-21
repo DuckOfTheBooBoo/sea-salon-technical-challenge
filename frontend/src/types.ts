@@ -5,4 +5,14 @@ export interface ReservationRequest {
     date: string;
     time: string;
 }
-  
+
+export interface Reservation {
+
+}
+
+export interface Review {
+    full_name: string;
+    rating: number;
+    comment: string;
+}
+
