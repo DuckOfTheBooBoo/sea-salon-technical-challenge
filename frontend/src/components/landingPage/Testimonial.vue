@@ -40,39 +40,7 @@ const reviewForm = useForm({
   validationSchema: reviewFormSchema
 });
 
-// Temporary reviews array state
-const reviews: Ref<ReviewType[]> = ref([
-  // {
-  //   full_name: "Emily Johnson",
-  //   rating: 5,
-  //   comment:
-  //     "I loved my haircut at SEA Salon! The stylist was very skilled and understood exactly what I wanted.",
-  // },
-  // {
-  //   full_name: "David Smith",
-  //   rating: 5,
-  //   comment:
-  //     "Outstanding service! The pedicure and manicure were done professionally. My nails look perfect.",
-  // },
-  // {
-  //   full_name: "Sophia Lee",
-  //   rating: 4,
-  //   comment:
-  //     "The facial treatment was refreshing and relaxing. I felt rejuvenated afterwards.",
-  // },
-  // {
-  //   full_name: "Michael Brown",
-  //   rating: 3,
-  //   comment:
-  //     "Decent salon overall. Had a good haircut, but the waiting time was a bit long.",
-  // },
-  // {
-  //   full_name: "Emma Davis",
-  //   rating: 4,
-  //   comment:
-  //     "Great experience! The ambiance was pleasant and the staff were friendly and attentive.",
-  // },
-]);
+const reviews: Ref<ReviewType[]> = ref([]);
 
 const onReviewSubmit = reviewForm.handleSubmit(async (values) => {
   const newReview: ReviewType = {
