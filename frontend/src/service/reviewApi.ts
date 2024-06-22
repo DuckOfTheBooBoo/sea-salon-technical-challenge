@@ -13,7 +13,7 @@ export const addReview = async (values: Review): Promise<Review> => {
 
 export const getReviews = async (): Promise<Review[]> => {
   try {
-    const response = await apiClient.get("/review");
+    const response = await apiClient.get("/reviews");
     return response.data as Review[];
   } catch (error: unknown) {
     console.error("Error making new reservation: ", error);
