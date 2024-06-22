@@ -6,7 +6,7 @@ import (
 )
 
 func ReservationRoute(route *gin.RouterGroup) {
-	reservation := route.Group("/reservation")
+	reservation := route.Group("/reservations")
 
 	reservation.POST("/", controllers.ReservationCreate)
 }
