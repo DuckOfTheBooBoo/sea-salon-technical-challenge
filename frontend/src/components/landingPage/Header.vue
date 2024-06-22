@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-  // CalendarDate,
+  //  
   DateFormatter,
   getLocalTimeZone,
   parseDate,
@@ -119,6 +119,7 @@ const onReservationSubmit = reservationForm.handleSubmit(async (values): Promise
       <span>SEA Salon</span>
       <a href="#services">Our Services</a>
       <a href="#reviews">Testimonials</a>
+      <RouterLink to="/login">Login</RouterLink>
     </div>
 
     <div>
