@@ -43,6 +43,7 @@ func main() {
 	routes.ReservationRoute(api)
 	routes.ReviewRoute(api)
 	routes.UserRoute(api)
+	routes.AuthRoute(api)
 
 	r.Run(":3000")
 }
