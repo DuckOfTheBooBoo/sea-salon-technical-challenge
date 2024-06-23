@@ -46,8 +46,9 @@ import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import * as z from "zod";
 import {ref, computed, Ref} from 'vue';
+import { useToast } from "@/components/ui/toast/use-toast";
 
-const props = defineProps<{toast: Function}>();
+const {toast} = useToast()
 
 // Reservation
 const df = new DateFormatter("en-US", {
@@ -95,7 +96,7 @@ const onReservationSubmit = reservationForm.handleSubmit(async (values): Promise
 
     try {
       await addReservation(requestBody);
-      props.toast({
+      toast({
         title: "Success!",
         description: "Your reservation has been submitted",
       });
@@ -103,7 +104,7 @@ const onReservationSubmit = reservationForm.handleSubmit(async (values): Promise
       isReservationFormOpen.value = false;
     } catch (error: unknown) {
       const err = error as Error;
-      props.toast({
+      toast({
         title: "Something went wrong!",
         description: err.message,
       });

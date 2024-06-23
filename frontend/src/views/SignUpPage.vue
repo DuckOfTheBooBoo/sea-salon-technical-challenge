@@ -15,7 +15,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Toaster from "@/components/ui/toast/Toaster.vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toTypedSchema } from "@vee-validate/zod";

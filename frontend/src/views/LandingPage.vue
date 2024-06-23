@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import ServiceCard from "@/components/ServiceCard.vue";
 import { Icon } from "@iconify/vue";
-import Toaster from "@/components/ui/toast/Toaster.vue";
 import { useToast } from "@/components/ui/toast/use-toast";
 import LandingHeader from '@/components/landingPage/Header.vue';
 import LandingTestimonial from '@/components/landingPage/Testimonial.vue'
@@ -43,9 +42,7 @@ const services: Service[] = [
 </script>
 
 <template>
-  <Toaster />
-
-  <LandingHeader :toast="toast"/>
+  <LandingHeader />
 
   <div class="flex w-screen h-screen justify-center items-center">
     <div class="bg-white flex flex-col w-[50%] justify-center">
