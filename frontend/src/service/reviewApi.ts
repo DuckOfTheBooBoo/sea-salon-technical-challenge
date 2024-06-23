@@ -16,7 +16,7 @@ export const getReviews = async (): Promise<Review[]> => {
     const response = await apiClient.get("/reviews");
     return response.data as Review[];
   } catch (error: unknown) {
-    console.error("Error making new reservation: ", error);
-    throw new Error("Failed to make new reservation");
+    console.error("Error fetching reservations: ", error);
+    throw new Error("Failed to fetch reservations");
   }
 }

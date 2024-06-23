@@ -18,13 +18,22 @@ export interface SignUpRequest {
     last_name?: string;
     email: string;
     password: string;
-    phoneNumber: string;
+    phone_number: string;
 }
 
 export interface SignUpResponse extends GormModel {
     full_name: string;
     email: string;
     role: 'Customer' | 'Admin';
+}
+
+export interface LogInRequest {
+    email: string;
+    password: string;
+}
+
+export interface LogInResponse {
+    token: string;
 }
 
 export interface Reservation {
