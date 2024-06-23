@@ -160,7 +160,7 @@ const onSignUpSubmit = signUpForm.handleSubmit(async (values) => {
                   v-bind="componentField"
                 />
               </FormControl>
-              <FormDescription>e.g +62 812 3456 7890</FormDescription>
+              <FormDescription>e.g +6281234567890</FormDescription>
               <FormMessage class="text-xs h-4" />
             </FormItem>
           </FormField>
@@ -191,8 +191,9 @@ const onSignUpSubmit = signUpForm.handleSubmit(async (values) => {
             </FormItem>
           </FormField>
         </CardContent>
-        <CardFooter>
-          <Button type="submit">Submit</Button>
+        <CardFooter class="flex flex-col">
+          <Button type="submit" class="w-1/2">Register</Button>
+          <RouterLink to="/login" class="text-base my-2">Already have an account?</RouterLink>
         </CardFooter>
       </form>
     </Card>
