@@ -1,14 +1,16 @@
 package controllers
 
 import (
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
-	"fmt"
 
 	"github.com/DuckOfTheBooBoo/sea-salon-technical-challenge/backend/models"
 	"github.com/DuckOfTheBooBoo/sea-salon-technical-challenge/backend/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -18,11 +20,11 @@ func UserCreate(c *gin.Context) {
 	validate := validator.New()
 
 	var userBody struct {
-		FirstName string `json:"first_name" validate:"required"` 
-		LastName string `json:"last_name" validate:"required"`
-		Email    string `json:"email" validate:"required,email"`
+		FirstName   string `json:"first_name" validate:"required"`
+		LastName    string `json:"last_name" validate:"required"`
+		Email       string `json:"email" validate:"required,email"`
 		PhoneNumber string `json:"phone_number" validate:"required,e164"`
-		Password string `json:"password" validate:"required"`
+		Password    string `json:"password" validate:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&userBody); err != nil {
@@ -50,15 +52,36 @@ func UserCreate(c *gin.Context) {
 
 	// Create user
 	user := models.User{
-		FullName:  fmt.Sprintf("%s %s", userBody.FirstName, userBody.LastName),
-		Email:     userBody.Email,
+		FullName:    fmt.Sprintf("%s %s", userBody.FirstName, userBody.LastName),
+		Email:       userBody.Email,
 		PhoneNumber: userBody.PhoneNumber,
-		Password:  hashedPass,
-		Role:      "Customer",
+		Password:    hashedPass,
+		Role:        "Customer",
 	}
 
 	if err := db.Create(&user).Error; err != nil {
-		c.Status(http.StatusInternalServerError)
+		var mysqlErr *mysql.MySQLError
+
+		if errors.As(err, &mysqlErr) {
+			switch mysqlErr.Number {
+			case 1062: // Duplicate email entry
+				c.JSON(http.StatusConflict, gin.H{
+					"error":      "User already exists",
+					"error_code": mysqlErr.Number,
+				})
+				return
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error":      "Database error",
+					"error_code": mysqlErr.Number,
+				})
+			}
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Internal server error",
+			})
+		}
+
 		log.Println(err.Error())
 		return
 	}
