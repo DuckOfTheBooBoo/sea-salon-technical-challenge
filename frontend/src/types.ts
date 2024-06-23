@@ -36,6 +36,11 @@ export interface LogInResponse {
     token: string;
 }
 
+export interface ErrorResponse {
+    error: string;
+    error_code: number;
+}
+
 export interface Reservation {
 
 }

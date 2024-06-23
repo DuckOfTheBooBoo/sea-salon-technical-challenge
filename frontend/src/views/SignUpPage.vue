@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Toaster from "@/components/ui/toast/Toaster.vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toTypedSchema } from "@vee-validate/zod";
@@ -23,8 +24,11 @@ import * as z from "zod";
 import {SignUpRequest, SignUpResponse} from "@/types";
 import { addNewUser } from "@/service/authApi";
 import { useToast } from "@/components/ui/toast/use-toast";
+import { AuthError } from "@/errors/auth";
+import { useRouter } from "vue-router";
 
 const { toast } = useToast();
+const router = useRouter();
 
 const signUpFormSchema = toTypedSchema(
   z.object({
@@ -74,12 +78,17 @@ const onSignUpSubmit = signUpForm.handleSubmit(async (values) => {
     password: values.password,
     phone_number: values.phoneNumber,
   };
-  console.log(request)
+
   try {
     const response: SignUpResponse = await addNewUser(request);
-
+    router.push({ name: "login" });
   } catch (error: unknown) {
-    const err: Error = error as Error;
+    const err: AuthError = error as AuthError;
+    console.log(err.code)
+    if (err.code === 409) {
+      signUpForm.setFieldError("email", err.message);
+    }
+
     toast({
       title: "Something went wrong",
       description: err.message,
@@ -89,8 +98,6 @@ const onSignUpSubmit = signUpForm.handleSubmit(async (values) => {
 </script>
 
 <template>
-  <Toaster />
-
   <div class="w-screen h-screen flex justify-center items-center">
     <Card class="max-w-xl">
       <form @submit.prevent="onSignUpSubmit">

@@ -23,6 +23,8 @@ import {LogInRequest, LogInResponse} from "@/types";
 import { logIn } from "@/service/authApi";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { useRouter } from "vue-router";
+import { AuthError } from "@/errors/auth";
+import { HTTP_UNAUTHORIZED } from "@/constants";
 
 const { toast } = useToast();
 const router = useRouter();
@@ -61,7 +63,11 @@ const onLogInSubmit = logInForm.handleSubmit(async (values) => {
     const response: LogInResponse = await logIn(request);
     localStorage.setItem("token", response.token);
   } catch (error: unknown) {
-    const err: Error = error as Error;
+    const err: AuthError = error as AuthError;
+    if (err.code === HTTP_UNAUTHORIZED) {
+      logInForm.setFieldError("password", err.message);
+      logInForm.setFieldError("email", err.message);
+    }
     toast({
       title: "Something went wrong",
       description: err.message,
@@ -71,8 +77,6 @@ const onLogInSubmit = logInForm.handleSubmit(async (values) => {
 </script>
 
 <template>
-  <Toaster />
-
   <div class="w-screen h-screen flex justify-center items-center">
     <Card class="max-w-xl">
       <form @submit.prevent="onLogInSubmit">
