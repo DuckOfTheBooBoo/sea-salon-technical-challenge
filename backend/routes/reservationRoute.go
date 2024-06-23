@@ -8,5 +8,5 @@ import (
 func ReservationRoute(route *gin.RouterGroup) {
 	reservation := route.Group("/reservations")
 
-	reservation.POST("/", controllers.ReservationCreate)
+	reservation.POST("", controllers.ReservationCreate)
 }

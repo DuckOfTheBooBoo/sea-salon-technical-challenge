@@ -8,6 +8,6 @@ import (
 func ReviewRoute(route *gin.RouterGroup) {
 	review := route.Group("/reviews")
 
-	review.GET("/", controllers.ReviewGet)
-	review.POST("/", controllers.ReviewCreate)
+	review.GET("", controllers.ReviewGet)
+	review.POST("", controllers.ReviewCreate)
 }
