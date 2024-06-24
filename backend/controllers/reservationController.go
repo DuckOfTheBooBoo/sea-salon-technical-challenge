@@ -6,12 +6,25 @@ import (
 	"time"
 
 	"github.com/DuckOfTheBooBoo/sea-salon-technical-challenge/backend/models"
+	"github.com/DuckOfTheBooBoo/sea-salon-technical-challenge/backend/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 func ReservationCreate(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
+	userClaim := c.MustGet("userClaims").(*utils.UserClaims)
+
+	// Get user details
+	var user models.User
+
+	if err := db.Where("id = ?", userClaim.ID).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "User not found",
+			"error_code": http.StatusNotFound,
+		})
+		return
+	}
 
 	var reservationBody struct {
 		FullName    string `json:"full_name"`
@@ -40,10 +53,11 @@ func ReservationCreate(c *gin.Context) {
 
 	// Create reservation
 	reservation := models.Reservation{
-		FullName:    reservationBody.FullName,
-		PhoneNumber: reservationBody.PhoneNumber,
+		FullName:    user.FullName,
+		PhoneNumber: user.PhoneNumber,	
 		Service:     reservationBody.Service,
 		Date:        date,
+		UserID:      user.ID,
 	}
 
 	// Save reservation to database

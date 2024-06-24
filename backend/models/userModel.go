@@ -9,4 +9,6 @@ type User struct {
 	PhoneNumber string `gorm:"not null" json:"phone_number"`
 	Password string `gorm:"not null" json:"-"`
 	Role string `gorm:"not null" json:"role"`
+	Reservations []*Reservation `gorm:"foreignKey:UserID" json:"-"`
+	Reviews []*Review `gorm:"foreignKey:UserID" json:"-"`
 }
