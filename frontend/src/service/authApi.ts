@@ -26,7 +26,7 @@ export const logIn = async (values: LogInRequest): Promise<LogInResponse> => {
         const err: AxiosError = error as AxiosError;
         console.error("Error logging in: ", err);
         if (err.response?.status === HTTP_UNAUTHORIZED) {
-            throw new AuthError("Invalid email or password", err.response?.status as number);
+            throw new AuthError("Invalid credentials", err.response?.status as number);
         }
         throw new Error("Failed to log in");
     }
