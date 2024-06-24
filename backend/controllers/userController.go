@@ -88,3 +88,23 @@ func UserCreate(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, user)
 }
+
+func UserGet(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	userClaim := c.MustGet("userClaims").(*utils.UserClaims)	
+
+	// Create user
+	var user models.User
+
+	if err := db.Where("id = ?", userClaim.ID).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "User not found",
+			"error_code": http.StatusNotFound,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"user": user,
+	})
+}
