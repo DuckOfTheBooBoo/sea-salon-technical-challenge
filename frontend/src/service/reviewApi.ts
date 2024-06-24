@@ -1,4 +1,4 @@
-import { apiClient } from "./axiosApi";
+import apiClient from "./axiosApi";
 import { Review } from "@/types";
 
 export const addReview = async (values: Review): Promise<Review> => {

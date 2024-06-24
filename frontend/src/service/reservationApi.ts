@@ -1,4 +1,4 @@
-import { apiClient } from "./axiosApi";
+import apiClient from "./axiosApi";
 import { ReservationRequest } from "@/types";
 
 export const addReservation = async (values: ReservationRequest) => {

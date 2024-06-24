@@ -1,4 +1,4 @@
-import { apiClient } from "./axiosApi";
+import apiClient from "./axiosApi";
 import { LogInRequest, LogInResponse, SignUpRequest, SignUpResponse, ErrorResponse } from "@/types";
 import { AuthError } from "@/errors/auth";
 import { AxiosError } from "axios";
