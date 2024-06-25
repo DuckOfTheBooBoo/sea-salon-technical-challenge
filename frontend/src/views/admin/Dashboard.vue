@@ -10,6 +10,8 @@ import { Plus } from 'lucide-vue-next'
 const branches: Ref<Coordinate[]> = ref([]);
 const currentView: Ref<string> = ref("branches");
 
+const location: Ref<Coordinate> = ref({} as Coordinate);
+
 const onClick = () => {
   currentView.value = currentView.value === "branches" ? "form" : "branches";
 };
@@ -18,9 +20,21 @@ const handleViewChange = (newView: string) => {
   currentView.value = newView;
 }
 
-watch(currentView, () => {
-  console.log(currentView.value)
-})
+const handleBranchChange = (newBranches: Coordinate[]) => {
+  branches.value = newBranches
+}
+
+const registerClickListener: Ref<boolean> = ref(false);
+
+const enableDropPin = () => {
+  registerClickListener.value = true;
+};
+
+const handleLocationChange = (newLocation: Coordinate) => {
+  location.value = newLocation
+  registerClickListener.value = false;
+}
+
 </script>
 
 <template>
@@ -36,10 +50,10 @@ watch(currentView, () => {
             <Plus />Add new branch
           </Button>
         </div>
-        <BranchForm v-else :current-view="currentView" @update:view="handleViewChange" />
+        <BranchForm v-else :current-view="currentView" @update:view="handleViewChange" :location="location" @drop-pin="enableDropPin" />
       </div>
       <div class="w-full h-full">
-        <GoogleMap :branches="branches" />
+        <GoogleMap :branches="branches" @update:branches="handleBranchChange" :location="location" @update:location="handleLocationChange" :register-click-listener="registerClickListener" />
       </div>
     </div>
   </div>

@@ -15,10 +15,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
+import { type Coordinate } from "@/types";
 import * as z from "zod";
 
 defineProps<{
   currentView: string;
+  location: Coordinate;
+}>();
+
+const emit = defineEmits<{
+  (e: 'drop-pin'): void;
 }>();
 
 const branchFormSchema = toTypedSchema(
@@ -89,6 +95,7 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
               type="text"
               placeholder="Enter the branch latitude"
               v-bind="componentField"
+              v-model="location.lat"
             />
           </FormControl>
           <FormDescription class="w-fit text-xs">
@@ -105,6 +112,7 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
               type="text"
               placeholder="Enter the branch longitude"
               v-bind="componentField"
+              v-model="location.lng"
             />
           </FormControl>
           <FormDescription class="w-fit text-xs">
@@ -114,7 +122,7 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
         </FormItem>
       </FormField>
       <Separator class="content:'or'"/>
-      <Button class="w-full my-2 flex gap-3" variant="outline">
+      <Button class="w-full my-2 flex gap-3" variant="outline" @click="emit('drop-pin')">
         <MapPin /> Drop a pin
       </Button>
       <Button type="submit" :disabled="false" class="w-full flex gap-3" variant="outline">
