@@ -8,8 +8,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {ArrowLeft, Plus, MapPin} from 'lucide-vue-next'
-import { Textarea } from "@/components/ui/textarea"
+import { Toggle } from "@/components/ui/toggle";
+import { ArrowLeft, Plus, MapPin } from "lucide-vue-next";
+import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,38 +18,58 @@ import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import { type Coordinate } from "@/types";
 import * as z from "zod";
+import { ref, Ref, watch } from 'vue';
 
-defineProps<{
+const props = defineProps<{
   currentView: string;
   location: Coordinate;
 }>();
 
 const emit = defineEmits<{
-  (e: 'drop-pin'): void;
-  (e: 'update:view', view: string): void;
+  (e: "drop-pin"): void;
+  (e: "update:view", view: string): void;
+  (e: "update:branch-name", name: string): void;
 }>();
+
+const dropPinToggle: Ref<boolean> = ref(false);
 
 const branchFormSchema = toTypedSchema(
   z.object({
     name: z.string().min(1, { message: "Branch name is required" }),
     address: z.string().min(1, { message: "Branch address is required" }),
-    lat: z.number().min(1, { message: "Latitude is required" }),
-    lng: z.number().min(1, { message: "Longitude is required" }),
+    lat: z.number().min(-90).max(90),
+    lng: z.number().min(-180).max(180),
   })
 );
 
 const branchForm = useForm({
   validationSchema: branchFormSchema,
-}); 
+});
 
-const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
-  
+// We could watch for props.location to change, which indicates the pin drop has been done
+watch(() => props.location, () => {
+  dropPinToggle.value = false;
+  branchForm.setFieldValue("lat", props.location.lat);
+  branchForm.setFieldValue("lng", props.location.lng);
 })
+
+watch(() => branchForm.values.name, () => {
+  if (!branchForm.values.name) return;
+  emit("update:branch-name", branchForm.values.name);
+})
+
+const onBranchFormSubmit = branchForm.handleSubmit((values) => {
+  console.log(values)
+});
 </script>
 
 <template>
   <div class="flex items-center gap-2">
-    <Button @click="emit('update:view', 'branches')" class="rounded-full w-fit h-fit" variant="ghost">
+    <Button
+      @click="emit('update:view', 'branches')"
+      class="rounded-full w-fit h-fit"
+      variant="ghost"
+    >
       <ArrowLeft class="w-fit h-fit" />
     </Button>
     <h1 class="text-xl font-bold">Add new branch</h1>
@@ -73,7 +94,10 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
       </FormField>
       <FormField v-slot="{ componentField }" name="address">
         <FormItem>
-          <FormLabel>Branch address</FormLabel>
+          <FormLabel>
+            Branch address
+
+          </FormLabel>
           <FormControl>
             <Textarea
               placeholder="Enter the branch's address details"
@@ -81,11 +105,11 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
               v-bind="componentField"
             />
           </FormControl>
+          <FormMessage class="text-xs h-4" />
           <FormDescription class="w-fit text-xs">
             e.g. Pondok Indah Mall 2, Level 1 Jl. Metro Pondok Indah Blok III-B
             Pondok Indah, Jakarta Selatan DKI Jakarta 12310 Indonesia
           </FormDescription>
-          <FormMessage class="text-xs h-4" />
         </FormItem>
       </FormField>
       <FormField v-slot="{ componentField }" name="lat">
@@ -93,7 +117,8 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
           <FormLabel>Latitude</FormLabel>
           <FormControl>
             <Input
-              type="text"
+              type="number"
+              step="any"
               placeholder="Enter the branch latitude"
               v-bind="componentField"
               v-model="location.lat"
@@ -105,12 +130,13 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
           <FormMessage class="text-xs h-4" />
         </FormItem>
       </FormField>
-      <FormField v-slot="{ componentField }" name="long">
+      <FormField v-slot="{ componentField }" name="lng">
         <FormItem>
           <FormLabel>Longitude</FormLabel>
           <FormControl>
             <Input
-              type="text"
+              type="number"
+              step="any"
               placeholder="Enter the branch longitude"
               v-bind="componentField"
               v-model="location.lng"
@@ -123,10 +149,20 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
         </FormItem>
       </FormField>
       <Separator />
-      <Button class="w-full my-2 flex gap-3" variant="outline" @click="emit('drop-pin')">
+      <Toggle
+        v-model:pressed="dropPinToggle"
+        class="w-full my-2 flex gap-3"
+        @click="emit('drop-pin')"
+        variant="outline"
+      >
         <MapPin /> Drop a pin
-      </Button>
-      <Button type="submit" :disabled="false" class="w-full flex gap-3" variant="outline">
+      </Toggle>
+      <Button
+        type="submit"
+        :disabled="false"
+        class="w-full flex gap-3"
+        variant="outline"
+      >
         <Plus /> Add new branch
       </Button>
     </form>
