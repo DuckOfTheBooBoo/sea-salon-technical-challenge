@@ -2,6 +2,8 @@ const animate = require("tailwindcss-animate")
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  plugins: [animate],
+  important: true,
   darkMode: ["class"],
   safelist: ["dark"],
   prefix: "",

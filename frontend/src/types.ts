@@ -6,8 +6,6 @@ export interface GormModel {
 }
 
 export interface ReservationRequest {
-    full_name: string;
-    phoneNumber: string;
     service: string;
     date: string;
     time: string;
@@ -51,3 +49,9 @@ export interface Review {
     comment: string;
 }
 
+export interface User {
+    full_name: string;
+    email: string;
+    phone_number: string;
+    role: 'Customer' | 'Admin';
+}
