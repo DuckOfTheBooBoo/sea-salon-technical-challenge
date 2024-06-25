@@ -25,6 +25,7 @@ defineProps<{
 
 const emit = defineEmits<{
   (e: 'drop-pin'): void;
+  (e: 'update:view', view: string): void;
 }>();
 
 const branchFormSchema = toTypedSchema(
@@ -47,7 +48,7 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
 
 <template>
   <div class="flex items-center gap-2">
-    <Button @click="$emit('update:view', 'branches')" class="rounded-full w-fit h-fit" variant="ghost">
+    <Button @click="emit('update:view', 'branches')" class="rounded-full w-fit h-fit" variant="ghost">
       <ArrowLeft class="w-fit h-fit" />
     </Button>
     <h1 class="text-xl font-bold">Add new branch</h1>
@@ -121,7 +122,7 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
           <FormMessage class="text-xs h-4" />
         </FormItem>
       </FormField>
-      <Separator class="content:'or'"/>
+      <Separator />
       <Button class="w-full my-2 flex gap-3" variant="outline" @click="emit('drop-pin')">
         <MapPin /> Drop a pin
       </Button>
