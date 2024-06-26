@@ -6,7 +6,7 @@ import BranchList from "@/components/dashboard/BranchList.vue";
 import GoogleMap from "@/components/dashboard/GoogleMapComp.vue";
 import BranchForm from "@/components/dashboard/BranchForm.vue";
 import { getBranches } from "@/service/branchApi";
-import { Plus } from "lucide-vue-next";
+import { Plus, Info } from "lucide-vue-next";
 import { toast } from "@/components/ui/toast";
 
 const branches: Ref<Branch[]> = ref([]);
@@ -83,10 +83,13 @@ onMounted(async () => {
           @drop-pin="enableDropPin"
           @update:branch-name="handleNameChange"
           @update:branch="handleNewBranch"
-          @reset:location="location = {} as Coordinate"
-        />
+          @reset:location="location = {} as Coordinate"/>
       </div>
       <div class="w-full h-full">
+        <div class="absolute z-10 flex gap-2 rounded-xl py-2 px-2 my-1 mx-2 bg-blue-100">
+          <Info />
+          <p class="text-base font-semibold">Click branch to see details.</p>
+        </div>
         <GoogleMap
           :branches="branches"
           :location="location"
