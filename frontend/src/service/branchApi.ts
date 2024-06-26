@@ -10,3 +10,13 @@ export const addBranch = async (values: Branch) => {
     throw new Error("Failed to make new branch");
   }
 };
+
+export const getBranches = async (): Promise<Branch[]> => {
+  try {
+    const response = await apiClient.get("/branches");
+    return response.data as Branch[];
+  } catch (error: unknown) {
+    console.error("Error fetching branches: ", error);
+    throw new Error("Failed to fetch branches");
+  }
+}

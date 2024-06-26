@@ -14,12 +14,13 @@ const props = defineProps<{
   branches: Branch[];
   location: Coordinate;
   registerClickListener: boolean;
+  center: Coordinate;
   branchName: string;
 }>();
 
+const zoom: Ref<number> = ref(12);
 let clickListener: any = null;
 const API_KEY: string = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-const center: Coordinate = { lat: 40.689247, lng: -74.044502 };
 const emit = defineEmits<{
   (e: "update:location", location: Coordinate): void;
 }>();
@@ -59,6 +60,10 @@ watch(
     addClickListener();
   }
 );
+
+watch(() => props.center, () => {
+  zoom.value = 17;
+})
 </script>
 
 <template>
@@ -66,7 +71,7 @@ watch(
     ref="mapRef"
     :api-key="API_KEY"
     :center="center"
-    :zoom="15"
+    :zoom="12"
     class="h-full"
     :fullscreen-control="false"
     :clickable-icons="false"
