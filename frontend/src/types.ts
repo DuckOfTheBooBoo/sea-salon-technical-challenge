@@ -55,3 +55,13 @@ export interface User {
     phone_number: string;
     role: 'Customer' | 'Admin';
 }
+
+export interface Coordinate {
+    lat: number;
+    lng: number;
+}
+
+export interface Branch extends Coordinate {
+    branch_name: string;
+    branch_address: string;
+}

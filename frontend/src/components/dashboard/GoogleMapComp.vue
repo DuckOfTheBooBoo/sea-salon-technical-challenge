@@ -6,12 +6,12 @@ import {
 } from "vue3-google-map";
 import { Store } from "lucide-vue-next";
 import { Ref, ref, watch } from "vue";
-import { type Coordinate } from "@/types";
+import { type Coordinate, type Branch } from "@/types";
 import { useToast } from '@/components/ui/toast/use-toast'
 
 const mapRef: Ref<any> = ref(null);
 const props = defineProps<{
-  branches: Coordinate[];
+  branches: Branch[];
   location: Coordinate;
   registerClickListener: boolean;
   branchName: string;
@@ -22,7 +22,6 @@ const API_KEY: string = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const center: Coordinate = { lat: 40.689247, lng: -74.044502 };
 const emit = defineEmits<{
   (e: "update:location", location: Coordinate): void;
-  (e: "update:branches", branches: Coordinate[]): void;
 }>();
 const {toast} = useToast()
 
@@ -36,9 +35,6 @@ const addClickListener = () => {
         lat: Number(event.latLng.lat()),
         lng: Number(event.latLng.lng()),
       };
-      // const newBranches = props.branches;
-      // newBranches.push(coordinate);
-      // emit("update:branches", newBranches);
       emit("update:location", coordinate);
       removeListener();
     }
@@ -79,13 +75,13 @@ watch(
   >
     <MarkerCluster>
       <CustomMarker
-        v-for="(branch, i) in branches"
+        v-for="branch in branches"
         :key="branch.lat + branch.lng"
         :options="{ position: branch }"
       >
-        <div class="text-center">
-          <div class="text-lg text-center font-semibold">Branch {{ i }}</div>
-          <Store class="w-6 h-6" />
+      <div class="flex flex-col justify-center gap-2 max-w-[20rem]">
+          <div class="text-lg text-center font-semibold bg-white rounded-lg px-2">{{ branch.branch_name }}</div>
+          <Store class="w-full h-6 text-center" />
         </div>
       </CustomMarker>
       <CustomMarker v-if="location" :options="{ position: location, anchorPoint: 'BOTTOM_CENTER' }">

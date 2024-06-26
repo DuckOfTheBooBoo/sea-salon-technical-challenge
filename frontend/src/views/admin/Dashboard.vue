@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, Ref, watch } from "vue";
-import { type Coordinate } from "@/types";
+import { type Branch, type Coordinate } from "@/types";
 import { Button } from "@/components/ui/button";
 import BranchList from "@/components/dashboard/BranchList.vue";
 import GoogleMap from "@/components/dashboard/GoogleMapComp.vue";
 import BranchForm from "@/components/dashboard/BranchForm.vue";
 import { Plus } from "lucide-vue-next";
 
-const branches: Ref<Coordinate[]> = ref([]);
+const branches: Ref<Branch[]> = ref([]);
 const currentView: Ref<string> = ref("branches");
 
 const location: Ref<Coordinate> = ref({} as Coordinate);
@@ -21,9 +21,9 @@ const handleViewChange = (newView: string) => {
   currentView.value = newView;
 };
 
-const handleBranchChange = (newBranches: Coordinate[]) => {
-  branches.value = newBranches;
-};
+const handleNewBranch = (newBranch: Branch) => {
+  branches.value.push(newBranch)
+}
 
 const handleNameChange = (newName: string) => {
   branchName.value = newName;
@@ -64,12 +64,13 @@ const handleLocationChange = (newLocation: Coordinate) => {
           :location="location"
           @drop-pin="enableDropPin"
           @update:branch-name="handleNameChange"
+          @update:branch="handleNewBranch"
+          @reset:location="location = {} as Coordinate"
         />
       </div>
       <div class="w-full h-full">
         <GoogleMap
           :branches="branches"
-          @update:branches="handleBranchChange"
           :location="location"
           @update:location="handleLocationChange"
           :register-click-listener="registerClickListener"

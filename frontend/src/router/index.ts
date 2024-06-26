@@ -11,7 +11,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/',
         name: 'landing',
-        component: AdminDashboard
+        component: LandingPage
     },
     {
         path: '/login',
@@ -22,6 +22,18 @@ const routes: RouteRecordRaw[] = [
         path: '/signup',
         name: 'signup',
         component: SignUpPage
+    },
+    {
+        path: '/admin',
+        name: 'admin-dashboard',
+        component: AdminDashboard,
+        meta: {protected: true}
+    },
+    {
+        path: '/dashboard',
+        name: 'customer-dashboard',
+        component: CustomerDashboard,
+        meta: {protected: true}
     }
 ]
 

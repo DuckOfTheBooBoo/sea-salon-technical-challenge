@@ -16,9 +16,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
-import { type Coordinate } from "@/types";
+import { type Coordinate, type Branch } from "@/types";
 import * as z from "zod";
 import { ref, Ref, watch } from 'vue';
+import { addBranch } from "@/service/branchApi";
+import { toast } from "../ui/toast";
 
 const props = defineProps<{
   currentView: string;
@@ -28,7 +30,9 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "drop-pin"): void;
   (e: "update:view", view: string): void;
+  (e: "update:branch", branch: Branch): void;
   (e: "update:branch-name", name: string): void;
+  (e: "reset:location"): void;
 }>();
 
 const dropPinToggle: Ref<boolean> = ref(false);
@@ -58,8 +62,30 @@ watch(() => branchForm.values.name, () => {
   emit("update:branch-name", branchForm.values.name);
 })
 
-const onBranchFormSubmit = branchForm.handleSubmit((values) => {
-  console.log(values)
+const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
+  const request: Branch = {
+    branch_name: values.name,
+    branch_address: values.address,
+    lat: values.lat,
+    lng: values.lng
+  }
+
+  try {
+    const resp: Branch = await addBranch(request);
+    emit('update:branch', resp);
+    emit('update:view', 'branches')
+    toast({
+      title: 'Success!',
+      description: `Successfully added ${request.branch_name}`
+    })
+    emit('reset:location')
+  } catch (error: unknown) {
+    const err: Error = error as Error;
+    toast({
+      title: 'Something went wrong',
+      description: err.message
+    })
+  }
 });
 </script>
 
@@ -121,7 +147,6 @@ const onBranchFormSubmit = branchForm.handleSubmit((values) => {
               step="any"
               placeholder="Enter the branch latitude"
               v-bind="componentField"
-              v-model="location.lat"
             />
           </FormControl>
           <FormDescription class="w-fit text-xs">
@@ -139,7 +164,6 @@ const onBranchFormSubmit = branchForm.handleSubmit((values) => {
               step="any"
               placeholder="Enter the branch longitude"
               v-bind="componentField"
-              v-model="location.lng"
             />
           </FormControl>
           <FormDescription class="w-fit text-xs">
