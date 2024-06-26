@@ -1,14 +1,9 @@
 <script setup lang="ts">
-import {
-  GoogleMap,
-  MarkerCluster,
-  CustomMarker,
-} from "vue3-google-map";
+import { GoogleMap, MarkerCluster, CustomMarker } from "vue3-google-map";
 import { Store } from "lucide-vue-next";
 import { Ref, ref, watch } from "vue";
 import { type Coordinate, type Branch } from "@/types";
-import { useToast } from '@/components/ui/toast/use-toast'
-
+import { useToast } from "@/components/ui/toast/use-toast";
 const mapRef: Ref<any> = ref(null);
 const props = defineProps<{
   branches: Branch[];
@@ -24,7 +19,8 @@ const API_KEY: string = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const emit = defineEmits<{
   (e: "update:location", location: Coordinate): void;
 }>();
-const {toast} = useToast()
+const { toast } = useToast();
+
 
 const addClickListener = () => {
   if (!mapRef.value?.ready) return;
@@ -56,14 +52,17 @@ watch(
     toast({
       title: "Drop Pin",
       description: "Click on the map to drop a pin",
-    })
+    });
     addClickListener();
   }
 );
 
-watch(() => props.center, () => {
-  zoom.value = 17;
-})
+watch(
+  () => props.center,
+  () => {
+    zoom.value = 17;
+  }
+);
 </script>
 
 <template>
@@ -82,16 +81,27 @@ watch(() => props.center, () => {
       <CustomMarker
         v-for="branch in branches"
         :key="branch.lat + branch.lng"
+        class="hover:cursor-pointer"
         :options="{ position: branch }"
       >
-      <div class="flex flex-col justify-center gap-2 max-w-[20rem]">
-          <div class="text-lg text-center font-semibold bg-white rounded-lg px-2">{{ branch.branch_name }}</div>
+        <div class="flex flex-col justify-center gap-2 max-w-[20rem]">
+          <div class="text-lg text-center font-semibold bg-white rounded-lg px-2">
+            {{ branch.branch_name }}
+          </div>
           <Store class="w-full h-6 text-center" />
         </div>
       </CustomMarker>
-      <CustomMarker v-if="location" :options="{ position: location, anchorPoint: 'BOTTOM_CENTER' }">
+
+      <CustomMarker
+        v-if="location"
+        :options="{ position: location, anchorPoint: 'BOTTOM_CENTER' }"
+      >
         <div class="flex flex-col justify-center gap-2 max-w-[20rem]">
-          <div class="text-lg text-center font-semibold bg-white rounded-lg px-2">{{ branchName }}</div>
+          <div
+            class="text-lg text-center font-semibold bg-white rounded-lg px-2"
+          >
+            {{ branchName }}
+          </div>
           <Store class="w-full h-6 text-center" />
         </div>
       </CustomMarker>
