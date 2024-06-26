@@ -59,8 +59,6 @@ const placeholder = ref();
 
 const reservationFormSchema = toTypedSchema(
   z.object({
-    name: z.string().min(1, { message: "Name is required" }),
-    phoneNumber: z.string().min(1, { message: "Phone number is required" }),
     service: z.string().min(1, { message: "Service is required" }),
     date: z.string().date().min(1, { message: "Date is required" }),
     time: z.string().min(1, { message: "Time is required" }),
@@ -87,8 +85,6 @@ const isReservationFormOpen: Ref<boolean> = ref(false);
 const onReservationSubmit = reservationForm.handleSubmit(async (values): Promise<void> => {
     // Construct the request body
     const requestBody: ReservationRequest = {
-      full_name: values.name,
-      phoneNumber: values.phoneNumber,
       service: values.service,
       date: values.date,
       time: values.time,
@@ -111,6 +107,10 @@ const onReservationSubmit = reservationForm.handleSubmit(async (values): Promise
     }
   }
 );
+
+const checkToken = (): string => {
+  return localStorage.getItem('token') || '';
+}
 </script>
 
 <template>
@@ -119,51 +119,25 @@ const onReservationSubmit = reservationForm.handleSubmit(async (values): Promise
       <span>SEA Salon</span>
       <a href="#services">Our Services</a>
       <a href="#reviews">Testimonials</a>
-      <RouterLink to="/signup">Become a Member</RouterLink>
     </div>
 
     <div>
       <Dialog v-model:open="isReservationFormOpen">
-        <DialogTrigger as-child>
-          <Button>Make a Reservation</Button>
-        </DialogTrigger>
+        <div v-if="checkToken() !== ''">
+          <DialogTrigger as-child>
+            <Button>Make a Reservation</Button>
+          </DialogTrigger>
+        </div>
+        <div v-else>
+          <RouterLink to="/signup">
+            <Button>Become a Member</Button>
+          </RouterLink>
+        </div>
         <DialogContent>
           <form @submit.prevent="onReservationSubmit">
             <DialogHeader>
               <DialogTitle>Reservation Form</DialogTitle>
             </DialogHeader>
-            <FormField v-slot="{ componentField }" name="name">
-              <FormItem>
-                <FormLabel>Your name</FormLabel>
-                <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="Enter your full name here"
-                    v-bind="componentField"
-                  />
-                </FormControl>
-                <FormDescription
-                  >This will be your reservation name.</FormDescription
-                >
-                <FormMessage class="text-xs h-4" />
-              </FormItem>
-            </FormField>
-            <FormField v-slot="{ componentField }" name="phoneNumber">
-              <FormItem>
-                <FormLabel>Your active phone number</FormLabel>
-                <FormControl>
-                  <Input
-                    type="tel"
-                    placeholder="Enter your active phone number here"
-                    v-bind="componentField"
-                  />
-                </FormControl>
-                <FormDescription
-                  >This will be your phone number.</FormDescription
-                >
-                <FormMessage class="text-xs h-4" />
-              </FormItem>
-            </FormField>
             <FormField v-slot="{ componentField }" name="service">
               <FormItem>
                 <FormLabel>Service type</FormLabel>
