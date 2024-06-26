@@ -23,7 +23,7 @@ func main() {
 
 	gormDB := db.GetDB()
 
-	if err := gormDB.AutoMigrate(&models.Reservation{}, &models.Review{}, &models.User{}, &models.Token{}); err != nil {
+	if err := gormDB.AutoMigrate(&models.Reservation{}, &models.Review{}, &models.User{}, &models.Token{}, &models.Branch{}); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
