@@ -9,5 +9,6 @@ import (
 func BranchRoute(route *gin.RouterGroup) {
 	branches := route.Group("/branches")
 
+	branches.GET("", controllers.BranchGetAll)
 	branches.POST("", middlewares.JWTMiddleware(), controllers.BranchCreate)
 }

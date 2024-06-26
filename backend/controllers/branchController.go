@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/DuckOfTheBooBoo/sea-salon-technical-challenge/backend/models"
@@ -57,13 +58,26 @@ func BranchCreate(c *gin.Context) {
 
 	// Save new branch to database
 	if err := db.Create(&newBranch).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
+		log.Println(err)
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"branch": newBranch,
 	})
+}
+
+func BranchGetAll(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+
+	var branches []models.Branch
+
+	if err := db.Find(&branches).Error; err != nil {
+		c.Status(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, branches)
 }
