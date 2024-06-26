@@ -2,9 +2,15 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ref, watch, Ref } from "vue";
 import { Separator } from "@/components/ui/separator";
-import { type Branch as BranchType, type Coordinate} from "@/types";
-import Branch from "@/components/dashboard/Branch.vue";
-import { Toggle } from "@/components/ui/toggle";
+import { type Branch as BranchType, type Coordinate } from "@/types";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button"
+
 
 defineProps<{ branches: BranchType[] }>();
 const emit = defineEmits<{
@@ -23,10 +29,6 @@ watch(
     } as Coordinate);
   }
 );
-
-const compareBranch = (branch: BranchType): boolean =>  {
-  return selectedBranch.value === branch
-}
 </script>
 
 <template>
@@ -35,15 +37,30 @@ const compareBranch = (branch: BranchType): boolean =>  {
     <Separator />
 
     <ScrollArea class="rounded-md px-2 py-1 h-[520px]">
-      <Toggle
+      <Accordion
+        type="single"
+        class="w-full"
+        collapsible
+      >
+        <AccordionItem
         v-for="branch in branches"
         :key="`${branch.lat} + ${branch.lng}`"
-        class="flex gap-2 my-2 hover:cursor-pointer"
-        v-bind:pressed="compareBranch(branch)"
-        @click="selectedBranch = branch" 
-      >
-        <Branch :branch="branch"/>
-      </Toggle>
+        :value="branch.branch_name"
+        @click="selectedBranch = branch"
+        class="w-full"
+        >
+          <AccordionTrigger>
+            <p class="text-base">{{ branch.branch_name }}</p>
+          </AccordionTrigger>
+          <AccordionContent class="">
+            {{ branch.branch_address }}
+            <div class="flex w-full gap-2">
+              <Button class="w-1/2">Edit</Button>
+              <Button class="w-1/2">Delete</Button>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </ScrollArea>
   </div>
 </template>
