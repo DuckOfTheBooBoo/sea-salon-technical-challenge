@@ -11,4 +11,5 @@ func BranchRoute(route *gin.RouterGroup) {
 
 	branches.GET("", controllers.BranchGetAll)
 	branches.POST("", middlewares.JWTMiddleware(), controllers.BranchCreate)
+	branches.DELETE("/:id", middlewares.JWTMiddleware(), controllers.BranchDelete)
 }

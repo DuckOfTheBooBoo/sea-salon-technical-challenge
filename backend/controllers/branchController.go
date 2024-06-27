@@ -59,9 +59,9 @@ func BranchCreate(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Wrong time format. Should be hh:mm",
-			"time": branchBody.OpenTime,
+			"time":  branchBody.OpenTime,
 		})
-		
+
 		return
 	}
 
@@ -70,9 +70,9 @@ func BranchCreate(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Wrong time format. Should be hh:mm",
-			"time": branchBody.CloseTime,
+			"time":  branchBody.CloseTime,
 		})
-		
+
 		return
 	}
 
@@ -92,7 +92,7 @@ func BranchCreate(c *gin.Context) {
 		}
 		services = append(services, service)
 	}
-	
+
 	// Create new branch
 	newBranch := models.Branch{
 		BranchName:    branchBody.BranchName,
@@ -103,7 +103,6 @@ func BranchCreate(c *gin.Context) {
 		ClosedAt:      branchBody.CloseTime,
 	}
 
-	
 	// Save new branch to database
 	if err := db.Create(&newBranch).Error; err != nil {
 		c.Status(http.StatusInternalServerError)
@@ -135,4 +134,35 @@ func BranchGetAll(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, branches)
+}
+
+func BranchDelete(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	branchId := c.Param("id")
+
+	var branch models.Branch
+	if err := db.Preload("Services").Find(&branch).Where("id = ?", branchId).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.Status(http.StatusNotFound)
+			return
+		}
+
+		c.Status(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+
+	if err := db.Model(&branch).Association("Services").Clear(); err != nil {
+		c.Status(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+
+	if err := db.Delete(&branch).Error; err != nil {
+		c.Status(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
