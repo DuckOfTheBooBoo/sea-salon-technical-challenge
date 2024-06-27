@@ -14,18 +14,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ServiceInput from "./ServiceInput.vue";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import { type Coordinate, type Branch } from "@/types";
 import * as z from "zod";
-import { ref, Ref, watch } from 'vue';
+import { ref, Ref, watch, onMounted } from "vue";
 import { addBranch } from "@/service/branchApi";
-import { toast } from "../ui/toast";
+import { useToast } from "../ui/toast";
+import { hourMinuteParser } from "@/lib/utils";
 
 const props = defineProps<{
   currentView: string;
   location: Coordinate;
 }>();
+
+const { toast } = useToast();
 
 const emit = defineEmits<{
   (e: "drop-pin"): void;
@@ -36,6 +40,7 @@ const emit = defineEmits<{
 }>();
 
 const dropPinToggle: Ref<boolean> = ref(false);
+const timeRegex = /^([0-1][0-9]|2[0-3]):([0-5][0-9])$/;
 
 const branchFormSchema = toTypedSchema(
   z.object({
@@ -43,6 +48,19 @@ const branchFormSchema = toTypedSchema(
     address: z.string().min(1, { message: "Branch address is required" }),
     lat: z.number().min(-90).max(90),
     lng: z.number().min(-180).max(180),
+    services: z.array(z.string()).nonempty(),
+    openTime: z
+      .string()
+      .min(1, { message: "Open time is required" })
+      .regex(timeRegex, {
+        message: "Open time must be in format hh:mm",
+      }),
+    closeTime: z
+      .string()
+      .min(1, { message: "Close time is required" })
+      .regex(timeRegex, {
+        message: "Close time must be in format hh:mm",
+      }),
   })
 );
 
@@ -51,40 +69,54 @@ const branchForm = useForm({
 });
 
 // We could watch for props.location to change, which indicates the pin drop has been done
-watch(() => props.location, () => {
-  dropPinToggle.value = false;
-  branchForm.setFieldValue("lat", props.location.lat);
-  branchForm.setFieldValue("lng", props.location.lng);
-})
+watch(
+  () => props.location,
+  () => {
+    dropPinToggle.value = false;
+    branchForm.setFieldValue("lat", props.location.lat);
+    branchForm.setFieldValue("lng", props.location.lng);
+  }
+);
 
-watch(() => branchForm.values.name, () => {
-  if (!branchForm.values.name) return;
-  emit("update:branch-name", branchForm.values.name);
-})
+watch(
+  () => branchForm.values.name,
+  () => {
+    if (!branchForm.values.name) return;
+    emit("update:branch-name", branchForm.values.name);
+  }
+);
+
+const handleServiceInput = (values: string[]) => {
+  console.log(values)
+  branchForm.setFieldValue("services", values);
+}
 
 const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
   const request: Branch = {
     branch_name: values.name,
     branch_address: values.address,
     lat: values.lat,
-    lng: values.lng
-  }
+    lng: values.lng,
+    open_time: values.openTime,
+    close_time: values.closeTime,
+    services: values.services.map((service: string) => service.replace(' ', '-').toLowerCase()),
+  };
 
   try {
     const resp: Branch = await addBranch(request);
-    emit('update:branch', resp);
-    emit('update:view', 'branches')
+    emit("update:branch", resp);
+    emit("update:view", "branches");
     toast({
-      title: 'Success!',
-      description: `Successfully added ${request.branch_name}`
-    })
-    emit('reset:location')
+      title: "Success!",
+      description: `Successfully added ${request.branch_name}`,
+    });
+    emit("reset:location");
   } catch (error: unknown) {
     const err: Error = error as Error;
     toast({
-      title: 'Something went wrong',
-      description: err.message
-    })
+      title: "Something went wrong",
+      description: err.message,
+    });
   }
 });
 </script>
@@ -120,10 +152,7 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
       </FormField>
       <FormField v-slot="{ componentField }" name="address">
         <FormItem>
-          <FormLabel>
-            Branch address
-
-          </FormLabel>
+          <FormLabel> Branch address </FormLabel>
           <FormControl>
             <Textarea
               placeholder="Enter the branch's address details"
@@ -138,6 +167,49 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
           </FormDescription>
         </FormItem>
       </FormField>
+      <FormField v-slot="{ componentField }" name="services" class="mb-5">
+        <FormItem>
+          <FormLabel>
+            Services
+          </FormLabel>
+          <FormControl>
+            <ServiceInput v-bind="componentField" @update:services="handleServiceInput" />
+          </FormControl>
+          <FormDescription class="w-fit text-xs"> Services available in this branch </FormDescription>
+          <FormMessage class="text-xs h-4" />
+        </FormItem>
+      </FormField>
+      <div class="flex gap-2">
+        <FormField v-slot="{ componentField }" name="openTime">
+          <FormItem>
+            <FormLabel>Open time</FormLabel>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Enter open time in 24 hour format"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormDescription class="w-fit text-xs"> eg. 09:00 </FormDescription>
+            <FormMessage class="text-xs h-4" />
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ componentField }" name="closeTime">
+          <FormItem>
+            <FormLabel>Close time</FormLabel>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Enter close time in 24 hour format"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormDescription class="w-fit text-xs"> eg. 19:00 </FormDescription>
+            <FormMessage class="text-xs h-4" />
+          </FormItem>
+        </FormField>
+      </div>
+
       <FormField v-slot="{ componentField }" name="lat">
         <FormItem>
           <FormLabel>Latitude</FormLabel>

@@ -61,7 +61,17 @@ export interface Coordinate {
     lng: number;
 }
 
+
+export interface Service {
+    service_name: string;
+    service_code: string;
+    duration: number;
+}
+
 export interface Branch extends Coordinate {
     branch_name: string;
     branch_address: string;
+    services: Service[] | string[];
+    open_time: Date | string;
+    close_time: Date | string;
 }

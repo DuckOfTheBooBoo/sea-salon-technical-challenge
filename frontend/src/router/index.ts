@@ -3,7 +3,7 @@ import LandingPage from '@/views/LandingPage.vue';
 import Login from '@/views/auth/LoginPage.vue';
 import SignUpPage from '@/views/auth/SignUpPage.vue';
 import AdminDashboard from '@/views/admin/Dashboard.vue';
-import CustomerDashboard from '@/views/customer/Dashboard.vue';
+// import CustomerDashboard from '@/views/customer/Dashboard.vue';
 import { getUser } from '@/service/userApi';
 import { User } from '@/types';
 
@@ -29,12 +29,12 @@ const routes: RouteRecordRaw[] = [
         component: AdminDashboard,
         meta: {protected: true}
     },
-    {
-        path: '/dashboard',
-        name: 'customer-dashboard',
-        component: CustomerDashboard,
-        meta: {protected: true}
-    }
+    // {
+    //     path: '/dashboard',
+    //     name: 'customer-dashboard',
+    //     component: CustomerDashboard,
+    //     meta: {protected: true}
+    // }
 ]
 
 const router = createRouter({ history: createWebHistory(), routes });

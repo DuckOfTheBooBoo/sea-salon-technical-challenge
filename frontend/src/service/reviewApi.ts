@@ -3,7 +3,7 @@ import { Review } from "@/types";
 
 export const addReview = async (values: Review): Promise<Review> => {
   try {
-    const response = await apiClient.post("/review", values);
+    const response = await apiClient.post("/reviews", values);
     return response.data.review as Review;
   } catch (error: unknown) {
     console.error("Error making new review: ", error);

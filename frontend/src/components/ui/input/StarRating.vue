@@ -27,18 +27,11 @@ const setRating = (stars: number): void => {
 }
 
 onBeforeMount(() => {
-  console.log(props.modelValue)
   setRating(props.modelValue)
 })
 
 watchEffect(() => {
   ratingStar.value = props.modelValue
-})
-
-onMounted(() => {
-  console.log('REF: ', ratingStar.value)
-  console.log('MODEL: ', props.modelValue)
-  console.log('FORM: ', rating.value)
 })
 </script>
 
