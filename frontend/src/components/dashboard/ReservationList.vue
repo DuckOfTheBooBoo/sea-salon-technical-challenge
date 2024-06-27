@@ -63,6 +63,8 @@ const props = defineProps<{
   branches: Branch[];
 }>();
 
+const services: Ref<Service[]> = ref([]);
+
 // Reservation
 const df = new DateFormatter("en-US", {
   dateStyle: "long",
@@ -73,11 +75,7 @@ const placeholder = ref();
 const reservationFormSchema = toTypedSchema(
   z.object({
     branch: z.string().min(1, { message: "Branch is required" }),
-    service: z.object({
-        service_name: z.string().min(1, { message: "Service is required" }),
-        service_code: z.string().min(1, { message: "Service is required" }),
-        duration: z.number().min(1, { message: "Duration is required" }),
-    }),
+    service: z.string().min(1, { message: "Service is required" }),
     date: z.string().date().min(1, { message: "Date is required" }),
     time: z.string().min(1, { message: "Time is required" }),
   })
@@ -96,29 +94,32 @@ const dateValue = computed({
 });
 
 const getServicesFromBranch = (branchName: string): Service[] => {
-  const branch = props.branches.find((b) => b.branch_name === branchName);
   if (!branch) {
     return [] as Service[];
   }
   return branch.services;
 };
 
-const availableTime = computed(() => {
+watch(() => reservationForm.values.branch, () => {
   const branch = props.branches.find((b) => b.branch_name === reservationForm.values.branch);
   if (branch) {
-      const services = getServicesFromBranch(branch.branch_name);
-      const service = services.find((s) => s.service_name === reservationForm.values.service?.service_name)
-      return generateAvailableTimes(
-        branch.open_time.substring(0, 5),
-        branch.close_time.substring(0, 5),
-        service?.duration ?? 0
-      )
+    services.value = branch.services;
   }
-});
-
-watch(() => reservationForm.values.service?.service_name, () => {
-  
 })
+
+const availableTime: Ref<string[]> = ref([]);
+
+watch(() => reservationForm.values.service, () => {
+  const branch = props.branches.find((b) => b.branch_name === reservationForm.values.branch);
+  const service = services.value.find((s) => s.service_name === reservationForm.values.service)
+  if (branch !== undefined && service !== undefined) {
+    availableTime.value = generateAvailableTimes(
+      branch.open_time.substring(0, 5),
+      branch.close_time.substring(0, 5),
+      service.duration
+    )
+  }
+})  
 
 const isReservationFormOpen: Ref<boolean> = ref(false);
 
@@ -177,15 +178,12 @@ const onReservationSubmit = reservationForm.handleSubmit(
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Branches</SelectLabel>
-                        <SelectItem
-                          v-for="branch in branches"
-                          :value="branch.branch_name"
-                        >
-                          {{ branch.branch_name }}
-                        </SelectItem>
-                      </SelectGroup>
+                      <SelectItem
+                        v-for="branch in branches"
+                        :value="branch.branch_name"
+                      >
+                        {{ branch.branch_name }}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription
@@ -200,7 +198,7 @@ const onReservationSubmit = reservationForm.handleSubmit(
                   <FormLabel>Service type</FormLabel>
                   <Select
                     v-bind="componentField"
-                    :disabled="!reservationForm.values.branch"
+                    :disabled="services.length === 0"
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -211,8 +209,8 @@ const onReservationSubmit = reservationForm.handleSubmit(
                       <SelectGroup>
                         <SelectLabel>Services</SelectLabel>
                         <SelectItem
-                          v-for="service in getServicesFromBranch(reservationForm.values.branch!)"
-                          :value="service.service_code"
+                          v-for="service in services"
+                          :value="service.service_name"
                         >
                           {{ service.service_name }}
                         </SelectItem>
@@ -302,7 +300,7 @@ const onReservationSubmit = reservationForm.handleSubmit(
                         <SelectGroup>
                           <SelectItem
                             v-for="hour in availableTime"
-                            :value="hour"
+                            :value="`${hour}`"
                             :key="hour"
                           >
                             {{ hour }}
@@ -325,7 +323,7 @@ const onReservationSubmit = reservationForm.handleSubmit(
         </Dialog>
       </div>
 
-      <ScrollArea class="h-[200px] w-[350px] rounded-md border p-4">
+      <ScrollArea class="h-[200px] w-[350px] rounded-md border px-2">
         Jokester began sneaking into the castle in the middle of the night and
         leaving jokes all over the place: under the king's pillow, in his soup,
         even in the royal toilet. The king was furious, but he couldn't seem to

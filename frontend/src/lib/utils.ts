@@ -32,12 +32,20 @@ export function generateAvailableTimes(openTime: string, closeTime: string, serv
   const openDate = parseTime(openTime);
   const closeDate = parseTime(closeTime);
 
+  console.log('Open Time:', openDate);
+  console.log('Close Time:', closeDate);
+
   // Generate available times
   let currentTime = new Date(openDate);
 
   while (currentTime < closeDate) {
       times.push(formatTime(currentTime));
+      console.log('Current Time:', currentTime); // Debugging line
       currentTime.setMinutes(currentTime.getMinutes() + serviceDuration);
+      if (times.length > 1000) { // Safety check to prevent infinite loop
+          console.error('Too many iterations, possible infinite loop');
+          break;
+      }
   }
 
   return times;
