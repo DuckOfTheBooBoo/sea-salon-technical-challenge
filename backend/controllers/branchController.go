@@ -122,6 +122,108 @@ func BranchCreate(c *gin.Context) {
 	})
 }
 
+func BranchUpdate(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	branchId := c.Param("id")
+
+	var branchBody struct {
+		BranchName    string   `json:"branch_name"`
+		BranchAddress string   `json:"branch_address"`
+		Lat           float64  `json:"lat"`
+		Lng           float64  `json:"lng"`
+		CloseTime     string   `json:"close_time"`
+		OpenTime      string   `json:"open_time"`
+		Services      []string `json:"services"`
+	}
+
+	// Bind request body to struct
+	if err := c.ShouldBindJSON(&branchBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	layout := "15:04"
+
+	// Convert open time to time.Time
+	_, err := time.Parse(layout, branchBody.OpenTime)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Wrong time format. Should be hh:mm",
+			"time":  branchBody.OpenTime,
+		})
+
+		return
+	}
+
+	// Convert close time to time.Time
+	_, err = time.Parse(layout, branchBody.CloseTime)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Wrong time format. Should be hh:mm",
+			"time":  branchBody.CloseTime,
+		})
+
+		return
+	}
+
+	// Get branch from id
+	var branch models.Branch
+	if err := db.Where("id = ?", branchId).First(&branch).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Branch not found",
+		})
+		return
+	}
+
+	// Reset association
+	if err := db.Model(&branch).Association("Services").Clear(); err != nil {
+		c.Status(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+
+	// Update branch
+	if err := db.Model(&branch).Session(&gorm.Session{FullSaveAssociations: true}).Updates(models.Branch{
+		BranchName:    branchBody.BranchName,
+		BranchAddress: branchBody.BranchAddress,
+		Lat:           branchBody.Lat,
+		Lng:           branchBody.Lng,
+		OpenAt:        branchBody.OpenTime,
+		ClosedAt:      branchBody.CloseTime,
+	}).Error; err != nil {
+		c.Status(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+
+	var services []models.Service
+	// Get services from service code
+	for _, code := range branchBody.Services {
+		var service models.Service
+		result := db.Where("service_code = ?", code).First(&service)
+		if result.Error != nil {
+			if result.Error == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"error": code + " service not found",
+				})
+				return
+			}
+		}
+		services = append(services, service)
+	}
+
+	// Replace services to branch
+	if err := db.Model(&branch).Association("Services").Append(&services); err != nil {
+		c.Status(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, branch)
+}
+
 func BranchGetAll(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
