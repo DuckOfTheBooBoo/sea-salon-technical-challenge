@@ -28,6 +28,7 @@ defineProps<{ branches: BranchType[] }>();
 const emit = defineEmits<{
   (e: "branch:focus", coordinate: Coordinate): void;
   (e: "branch:delete", branch: BranchType): void;
+  (e: "branch:edit", branch: BranchType): void;
 }>();
 
 const {toast} = useToast()
@@ -93,7 +94,7 @@ const deleteBranchMethod = async (branch: BranchType) => {
               </div>
             </div>
             <div class="flex w-full gap-2">
-              <Button class="w-1/2 text-sm my-1" variant="outline">Edit</Button>
+              <Button class="w-1/2 text-sm my-1" variant="outline" @click="emit('branch:edit', branch)">Edit</Button>
 
               <AlertDialog>
                 <AlertDialogTrigger as-child>

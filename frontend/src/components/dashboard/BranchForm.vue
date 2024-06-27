@@ -20,13 +20,13 @@ import { useForm } from "vee-validate";
 import { type Coordinate, type Branch } from "@/types";
 import * as z from "zod";
 import { ref, Ref, watch, onMounted } from "vue";
-import { addBranch } from "@/service/branchApi";
+import { addBranch, updateBranch } from "@/service/branchApi";
 import { useToast } from "../ui/toast";
-import { hourMinuteParser } from "@/lib/utils";
 
 const props = defineProps<{
   currentView: string;
   location: Coordinate;
+  branchData?: Branch;
 }>();
 
 const { toast } = useToast();
@@ -34,7 +34,7 @@ const { toast } = useToast();
 const emit = defineEmits<{
   (e: "drop-pin"): void;
   (e: "update:view", view: string): void;
-  (e: "update:branch", branch: Branch): void;
+  (e: "update:branch", branch: Branch, oldBranch?: Branch): void;
   (e: "update:branch-name", name: string): void;
   (e: "reset:location"): void;
 }>();
@@ -102,6 +102,28 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
     services: values.services.map((service: string) => service.replace(' ', '-').toLowerCase()),
   };
 
+  // Update
+  if (props.branchData) {
+    try {
+      const resp: Branch = await updateBranch(props.branchData, request);
+      emit("update:branch", resp, props.branchData);
+      emit("update:view", "branches");
+      toast({
+        title: "Success!",
+        description: `Successfully updated ${request.branch_name}`,
+      });
+      emit("reset:location");
+    } catch (error: unknown) {
+      const err: Error = error as Error;
+      toast({
+        title: "Something went wrong",
+        description: err.message,
+      });
+    }
+
+    return
+  }
+
   try {
     const resp: Branch = await addBranch(request);
     emit("update:branch", resp);
@@ -119,6 +141,18 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
     });
   }
 });
+
+onMounted(() => {
+  if (props.branchData) {
+    branchForm.setFieldValue("name", props.branchData.branch_name);
+    branchForm.setFieldValue("address", props.branchData.branch_address);
+    branchForm.setFieldValue("lat", props.branchData.lat);
+    branchForm.setFieldValue("lng", props.branchData.lng);
+    branchForm.setFieldValue("openTime", props.branchData.open_time.substring(0, 5));
+    branchForm.setFieldValue("closeTime", props.branchData.close_time.substring(0, 5));
+    branchForm.setFieldValue("services", props.branchData.services.map((s) => s.service_name));
+  }
+})
 </script>
 
 <template>
@@ -173,7 +207,7 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
             Services
           </FormLabel>
           <FormControl>
-            <ServiceInput v-bind="componentField" @update:services="handleServiceInput" />
+            <ServiceInput v-bind="componentField" @update:services="handleServiceInput" :services="branchData!.services" />
           </FormControl>
           <FormDescription class="w-fit text-xs"> Services available in this branch </FormDescription>
           <FormMessage class="text-xs h-4" />

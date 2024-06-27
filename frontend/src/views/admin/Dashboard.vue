@@ -14,16 +14,28 @@ const currentView: Ref<string> = ref("branches");
 const center: Ref<Coordinate> = ref({ lat: -6.310533833522174, lng: 106.80416367147718 });
 const location: Ref<Coordinate> = ref({} as Coordinate);
 const branchName: Ref<string> = ref("");
+const tempBranch: Ref<Branch> = ref({} as Branch);
 
 const onClick = () => {
   currentView.value = currentView.value === "branches" ? "form" : "branches";
 };
 
+const handleBranchEdit = (branch: Branch) => {
+  currentView.value = "form";
+  tempBranch.value = branch;
+}
+
 const handleViewChange = (newView: string) => {
   currentView.value = newView;
 };
 
-const handleNewBranch = (newBranch: Branch) => {
+const handleNewBranch = (newBranch: Branch, oldBranch?: Branch) => {
+  if (oldBranch) {
+    const index = branches.value.findIndex((b) => b.branch_name === oldBranch.branch_name);
+    branches.value[index] = newBranch;
+    return
+  }
+
   branches.value.push(newBranch)
 }
 
@@ -74,7 +86,11 @@ onMounted(async () => {
           class="w-full h-full flex flex-col justify-between pb-2"
           v-if="currentView === 'branches'"
         >
-          <BranchList :branches="branches" @branch:focus="handleCenterChange" @branch:delete="handleBranchDelete" />
+          <BranchList 
+            :branches="branches" 
+            @branch:focus="handleCenterChange" 
+            @branch:delete="handleBranchDelete"
+            @branch:edit="handleBranchEdit" />
           <Button @click="onClick" class="w-full flex gap-3" variant="outline">
             <Plus />Add new branch
           </Button>
@@ -87,7 +103,9 @@ onMounted(async () => {
           @drop-pin="enableDropPin"
           @update:branch-name="handleNameChange"
           @update:branch="handleNewBranch"
-          @reset:location="location = {} as Coordinate"/>
+          :branch-data="tempBranch"
+          @reset:location="location = {} as Coordinate"
+          />
       </div>
       <div class="w-full h-full">
         <div class="absolute z-10 flex gap-2 rounded-xl py-2 px-2 my-1 mx-2 bg-blue-100">

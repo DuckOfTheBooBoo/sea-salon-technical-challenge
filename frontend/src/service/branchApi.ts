@@ -21,6 +21,16 @@ export const getBranches = async (): Promise<Branch[]> => {
   }
 }
 
+export const updateBranch = async (oldBranch: Branch, request: any): Promise<Branch> => {
+  try {
+    const response = await apiClient.put("/branches/" + oldBranch.ID, request);
+    return response.data as Branch;
+  } catch (error: unknown) {
+    console.error("Error updating branch: ", error);
+    throw new Error("Failed to update " + oldBranch.branch_name);
+  }
+}
+
 export const deleteBranch = async (branch: Branch): Promise<void> => {
   try {
     await apiClient.delete("/branches/" + branch.ID);
