@@ -128,7 +128,7 @@ func BranchGetAll(c *gin.Context) {
 
 	var branches []models.Branch
 
-	if err := db.Find(&branches).Error; err != nil {
+	if err := db.Preload("Services").Find(&branches).Error; err != nil {
 		c.Status(http.StatusInternalServerError)
 		log.Println(err)
 		return
