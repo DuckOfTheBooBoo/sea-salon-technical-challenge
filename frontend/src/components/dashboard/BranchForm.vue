@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Toggle } from "@/components/ui/toggle";
-import { ArrowLeft, Plus, MapPin } from "lucide-vue-next";
+import { ArrowLeft, Plus, MapPin, Pencil } from "lucide-vue-next";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -87,7 +87,6 @@ watch(
 );
 
 const handleServiceInput = (values: string[]) => {
-  console.log(values)
   branchForm.setFieldValue("services", values);
 }
 
@@ -103,7 +102,7 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
   };
 
   // Update
-  if (props.branchData) {
+  if (props.branchData !== undefined && Object.keys(props.branchData).length > 0) {
     try {
       const resp: Branch = await updateBranch(props.branchData, request);
       emit("update:branch", resp, props.branchData);
@@ -143,7 +142,7 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
 });
 
 onMounted(() => {
-  if (props.branchData) {
+  if (props.branchData !== undefined && Object.keys(props.branchData).length > 0) {
     branchForm.setFieldValue("name", props.branchData.branch_name);
     branchForm.setFieldValue("address", props.branchData.branch_address);
     branchForm.setFieldValue("lat", props.branchData.lat);
@@ -158,7 +157,10 @@ onMounted(() => {
 <template>
   <div class="flex items-center gap-2">
     <Button
-      @click="emit('update:view', 'branches')"
+      @click="() => {
+        emit('update:view', 'branches')
+        branchForm.resetForm()
+      }"
       class="rounded-full w-fit h-fit"
       variant="ghost"
     >
@@ -292,8 +294,18 @@ onMounted(() => {
         :disabled="false"
         class="w-full flex gap-3"
         variant="outline"
+        v-if="Object.keys(branchData).length === 0"
       >
         <Plus /> Add new branch
+      </Button>
+      <Button
+        type="submit"
+        :disabled="false"
+        class="w-full flex gap-3"
+        variant="outline"
+        v-else
+      >
+        <Pencil /> Update branch
       </Button>
     </form>
   </ScrollArea>

@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import {deleteBranch} from '@/service/branchApi';
 import { useToast } from "../ui/toast";
+import { Badge } from "@/components/ui/badge"
 
 defineProps<{ branches: BranchType[] }>();
 const emit = defineEmits<{
@@ -86,12 +87,7 @@ const deleteBranchMethod = async (branch: BranchType) => {
               Open at: {{ branch.open_time }} Close at: {{ branch.close_time }}
             </div>
             <div class="flex gap-2 flex-wrap my-1">
-              <div
-                v-for="service in branch.services"
-                class="bg-slate-200 p-1 rounded-sm text-xs font-semibold px-2"
-              >
-                {{ service.service_name }}
-              </div>
+              <Badge v-for="service in branch.services">{{ service.service_name }}</Badge>
             </div>
             <div class="flex w-full gap-2">
               <Button class="w-1/2 text-sm my-1" variant="outline" @click="emit('branch:edit', branch)">Edit</Button>
