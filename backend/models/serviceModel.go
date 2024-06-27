@@ -1,9 +1,13 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Service struct {
 	gorm.Model
-	ServiceName string `gorm:"not null" json:"service_name"`
-	Branches []*Branch `gorm:"many2many:branch_services" json:"branch_services"`
+	ServiceName string `gorm:"not null;unique" json:"service_name"`
+	ServiceCode string `gorm:"not null;unique" json:"service_code"`
+	Duration uint `gorm:"not null" json:"duration"`
+	Branches []Branch `gorm:"many2many:branch_services" json:"branch_services"`
 }

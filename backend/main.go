@@ -45,6 +45,7 @@ func main() {
 	routes.UserRoute(api)
 	routes.AuthRoute(api)
 	routes.BranchRoute(api)
+	routes.ServiceRoute(api)
 
 	r.Run(":3000")
 }
