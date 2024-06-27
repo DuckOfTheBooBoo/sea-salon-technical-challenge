@@ -27,6 +27,10 @@ const handleNewBranch = (newBranch: Branch) => {
   branches.value.push(newBranch)
 }
 
+const handleBranchDelete = (branch: Branch) => {
+  branches.value = branches.value.filter((b) => b.branch_name !== branch.branch_name);
+}
+
 const handleNameChange = (newName: string) => {
   branchName.value = newName;
 };
@@ -70,7 +74,7 @@ onMounted(async () => {
           class="w-full h-full flex flex-col justify-between pb-2"
           v-if="currentView === 'branches'"
         >
-          <BranchList :branches="branches" @branch:focus="handleCenterChange" />
+          <BranchList :branches="branches" @branch:focus="handleCenterChange" @branch:delete="handleBranchDelete" />
           <Button @click="onClick" class="w-full flex gap-3" variant="outline">
             <Plus />Add new branch
           </Button>

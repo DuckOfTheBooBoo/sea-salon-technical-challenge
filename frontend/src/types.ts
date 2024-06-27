@@ -68,7 +68,7 @@ export interface Service {
     duration: number;
 }
 
-export interface Branch extends Coordinate {
+export interface Branch extends Coordinate, GormModel {
     branch_name: string;
     branch_address: string;
     services: Service[];
