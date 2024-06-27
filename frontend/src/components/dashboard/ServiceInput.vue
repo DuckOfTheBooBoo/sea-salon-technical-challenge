@@ -197,10 +197,10 @@ const handleBlur = () => {
 
     <Dialog v-model:open="isServiceFormOpen">
       <DialogTrigger as-child>
-        <TooltipProvider as-child>
+        <TooltipProvider>
           <Tooltip>
             <TooltipTrigger as-child>
-              <Button variant="outline" class="h-full"><Plus /></Button>
+              <Button variant="outline" class="h-full" @click="isServiceFormOpen = true"><Plus /></Button>
             </TooltipTrigger>
             <TooltipContent>
               <p>Add new service</p>
