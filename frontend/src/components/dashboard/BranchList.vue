@@ -53,10 +53,19 @@ watch(
             <p class="text-base">{{ branch.branch_name }}</p>
           </AccordionTrigger>
           <AccordionContent class="">
-            {{ branch.branch_address }}
+            <p>{{ branch.branch_address }}</p>
+            <div>
+              Open at: {{ branch.open_time }}
+              Close at: {{ branch.close_time }}
+            </div>
+            <div class="flex gap-2 flex-wrap my-1">
+              <div v-for="service in branch.services" class="bg-slate-200 p-1 rounded-sm text-xs font-semibold px-2">
+                {{ service.service_name }}
+              </div>
+            </div>
             <div class="flex w-full gap-2">
-              <Button class="w-1/2">Edit</Button>
-              <Button class="w-1/2">Delete</Button>
+              <Button class="w-1/2 text-sm my-1" variant="outline">Edit</Button>
+              <Button class="w-1/2 text-sm my-1" variant="destructive">Delete</Button>
             </div>
           </AccordionContent>
         </AccordionItem>

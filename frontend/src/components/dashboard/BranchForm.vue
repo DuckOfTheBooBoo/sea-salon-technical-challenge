@@ -92,7 +92,7 @@ const handleServiceInput = (values: string[]) => {
 }
 
 const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
-  const request: Branch = {
+  const request = {
     branch_name: values.name,
     branch_address: values.address,
     lat: values.lat,
