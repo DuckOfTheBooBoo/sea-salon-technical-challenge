@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Toggle } from "@/components/ui/toggle";
-import { ArrowLeft, Plus, MapPin } from "lucide-vue-next";
+import { ArrowLeft, Plus, MapPin, Pencil } from "lucide-vue-next";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -292,8 +292,18 @@ onMounted(() => {
         :disabled="false"
         class="w-full flex gap-3"
         variant="outline"
+        v-if="!branchData"
       >
         <Plus /> Add new branch
+      </Button>
+      <Button
+        type="submit"
+        :disabled="false"
+        class="w-full flex gap-3"
+        variant="outline"
+        v-else
+      >
+        <Pencil /> Update branch
       </Button>
     </form>
   </ScrollArea>
