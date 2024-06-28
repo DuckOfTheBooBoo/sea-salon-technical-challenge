@@ -52,10 +52,8 @@ func BranchCreate(c *gin.Context) {
 		return
 	}
 
-	layout := "15:04"
-
 	// Convert open time to time.Time
-	_, err := time.Parse(layout, branchBody.OpenTime)
+	openTime, err := utils.ParseTime(branchBody.OpenTime)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Wrong time format. Should be hh:mm",
@@ -66,7 +64,7 @@ func BranchCreate(c *gin.Context) {
 	}
 
 	// Convert close time to time.Time
-	_, err = time.Parse(layout, branchBody.CloseTime)
+	closeTime, err := utils.ParseTime(branchBody.CloseTime)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Wrong time format. Should be hh:mm",
@@ -99,8 +97,8 @@ func BranchCreate(c *gin.Context) {
 		BranchAddress: branchBody.BranchAddress,
 		Lat:           branchBody.Lat,
 		Lng:           branchBody.Lng,
-		OpenAt:        branchBody.OpenTime,
-		ClosedAt:      branchBody.CloseTime,
+		OpenAt:        openTime,
+		ClosedAt:      closeTime,
 	}
 
 	// Save new branch to database
@@ -184,14 +182,36 @@ func BranchUpdate(c *gin.Context) {
 		return
 	}
 
+	// Convert open time to time.Time
+	openTime, err := utils.ParseTime(branchBody.OpenTime)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Wrong time format. Should be hh:mm",
+			"time":  branchBody.OpenTime,
+		})
+
+		return
+	}
+
+	// Convert close time to time.Time
+	closeTime, err := utils.ParseTime(branchBody.CloseTime)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Wrong time format. Should be hh:mm",
+			"time":  branchBody.CloseTime,
+		})
+
+		return
+	}
+
 	// Update branch
 	if err := db.Model(&branch).Session(&gorm.Session{FullSaveAssociations: true}).Updates(models.Branch{
 		BranchName:    branchBody.BranchName,
 		BranchAddress: branchBody.BranchAddress,
 		Lat:           branchBody.Lat,
 		Lng:           branchBody.Lng,
-		OpenAt:        branchBody.OpenTime,
-		ClosedAt:      branchBody.CloseTime,
+		OpenAt:        openTime,
+		ClosedAt:      closeTime,
 	}).Error; err != nil {
 		c.Status(http.StatusInternalServerError)
 		log.Println(err)
