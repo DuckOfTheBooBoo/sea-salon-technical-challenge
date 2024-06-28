@@ -9,5 +9,6 @@ import (
 func ReservationRoute(route *gin.RouterGroup) {
 	reservation := route.Group("/reservations")
 
+	reservation.GET("", middlewares.JWTMiddleware(), controllers.ReservationGetAll)
 	reservation.POST("", middlewares.JWTMiddleware(), controllers.ReservationCreate)
 }

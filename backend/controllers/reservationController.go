@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -27,17 +28,26 @@ func ReservationCreate(c *gin.Context) {
 	}
 
 	var reservationBody struct {
-		FullName    string `json:"full_name"`
-		PhoneNumber string `json:"phone_number"`
 		Service     string `json:"service"`
 		Date        string `json:"date"`
 		Time		string `json:"time"`
+		BranchID    uint   `json:"branch_id"`
 	}
 
 	// Bind request body to struct
 	if err := c.ShouldBindJSON(&reservationBody); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
+		})
+		return
+	}
+
+	var branch models.Branch
+
+	if err := db.Where("id = ?", reservationBody.BranchID).First(&branch).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Branch not found",
+			"error_code": http.StatusNotFound,
 		})
 		return
 	}
@@ -58,6 +68,7 @@ func ReservationCreate(c *gin.Context) {
 		Service:     reservationBody.Service,
 		Date:        date,
 		UserID:      user.ID,
+		BranchID:    reservationBody.BranchID,
 	}
 
 	// Save reservation to database
@@ -71,4 +82,21 @@ func ReservationCreate(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"reservation": reservation,
 	})
+}
+
+func ReservationGetAll(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	userClaim := c.MustGet("userClaims").(*utils.UserClaims)
+
+	var reservations []models.Reservation
+
+	if err := db.Where("user_id = ?", userClaim.ID).Find(&reservations).Error; err != nil {
+		if err != gorm.ErrRecordNotFound {
+			c.Status(http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, reservations)
 }
