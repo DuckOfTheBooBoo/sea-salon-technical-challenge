@@ -9,6 +9,7 @@ export interface ReservationRequest {
     service: string;
     date: string;
     time: string;
+    branch_id: number;
 }
 
 export interface SignUpRequest {
@@ -39,8 +40,13 @@ export interface ErrorResponse {
     error_code: number;
 }
 
-export interface Reservation {
-
+export interface Reservation extends GormModel {
+    full_name: string;
+    phone_number: string;
+    service: string;
+    date: string;
+    user_id: number;
+    branch_id: number;
 }
 
 export interface Review {
@@ -60,7 +66,6 @@ export interface Coordinate {
     lat: number;
     lng: number;
 }
-
 
 export interface Service {
     service_name: string;

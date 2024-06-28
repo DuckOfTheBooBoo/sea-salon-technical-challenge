@@ -37,7 +37,6 @@ export function generateAvailableTimes(openTime: string, closeTime: string, serv
 
   while (currentTime < closeDate) {
       times.push(formatTime(currentTime));
-      console.log('Current Time:', currentTime); // Debugging line
       currentTime.setMinutes(currentTime.getMinutes() + serviceDuration);
       if (times.length > 1000) { // Safety check to prevent infinite loop
           console.error('Too many iterations, possible infinite loop');

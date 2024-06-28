@@ -1,5 +1,5 @@
 import apiClient from "./axiosApi";
-import { ReservationRequest } from "@/types";
+import { Reservation, ReservationRequest } from "@/types";
 
 export const addReservation = async (values: ReservationRequest) => {
   try {
@@ -10,3 +10,13 @@ export const addReservation = async (values: ReservationRequest) => {
     throw new Error("Failed to make new reservation");
   }
 };
+
+export const getReservationAll = async (): Promise<Reservation[]> => {
+  try {
+    const response = await apiClient.get("/reservations");
+    return response.data;
+  } catch (error: unknown) {
+    console.error("Error fetching reservations: ", error);
+    throw new Error("Failed to fetch reservations");
+  }
+}

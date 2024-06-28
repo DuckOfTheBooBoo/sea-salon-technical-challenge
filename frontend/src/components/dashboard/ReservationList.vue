@@ -46,16 +46,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { X } from 'lucide-vue-next';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { cn } from "@/lib/utils";
-import { addReservation } from "@/service/reservationApi";
-import { Branch, ReservationRequest, Service } from "@/types";
+import { addReservation, getReservationAll } from "@/service/reservationApi";
+import type { Branch, ReservationRequest, Reservation, Service } from "@/types";
 import { Input } from "@/components/ui/input";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import * as z from "zod";
-import { ref, computed, Ref, watch } from "vue";
+import { ref, computed, Ref, watch, onMounted } from "vue";
 import { useToast } from "@/components/ui/toast/use-toast";
-import {generateAvailableTimes} from '@/lib/utils'
+import { generateAvailableTimes } from '@/lib/utils'
 
 const { toast } = useToast();
 
@@ -64,6 +73,7 @@ const props = defineProps<{
 }>();
 
 const services: Ref<Service[]> = ref([]);
+const reservations: Ref<Reservation[]> = ref([]);
 
 // Reservation
 const df = new DateFormatter("en-US", {
@@ -93,13 +103,6 @@ const dateValue = computed({
   set: (val) => val,
 });
 
-const getServicesFromBranch = (branchName: string): Service[] => {
-  if (!branch) {
-    return [] as Service[];
-  }
-  return branch.services;
-};
-
 watch(() => reservationForm.values.branch, () => {
   const branch = props.branches.find((b) => b.branch_name === reservationForm.values.branch);
   if (branch) {
@@ -108,14 +111,19 @@ watch(() => reservationForm.values.branch, () => {
 })
 
 const availableTime: Ref<string[]> = ref([]);
+const timeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}$/;
+
 
 watch(() => reservationForm.values.service, () => {
   const branch = props.branches.find((b) => b.branch_name === reservationForm.values.branch);
-  const service = services.value.find((s) => s.service_name === reservationForm.values.service)
+  const service = services.value.find((s) => s.service_name === reservationForm.values.service);
+
   if (branch !== undefined && service !== undefined) {
+    const openTime = timeRegex.test(branch.open_time) ? branch.open_time.substring(11) : branch.open_time;
+    const closeTime = timeRegex.test(branch.close_time) ? branch.close_time.substring(11) : branch.close_time;
     availableTime.value = generateAvailableTimes(
-      branch.open_time.substring(0, 5),
-      branch.close_time.substring(0, 5),
+      openTime,
+      closeTime,
       service.duration
     )
   }
@@ -126,10 +134,12 @@ const isReservationFormOpen: Ref<boolean> = ref(false);
 const onReservationSubmit = reservationForm.handleSubmit(
   async (values): Promise<void> => {
     // Construct the request body
+    const branch = props.branches.find((b) => b.branch_name === values.branch);
     const requestBody: ReservationRequest = {
       service: values.service,
       date: values.date,
       time: values.time,
+      branch_id: branch!.ID,
     };
 
     try {
@@ -149,10 +159,22 @@ const onReservationSubmit = reservationForm.handleSubmit(
     }
   }
 );
+
+onMounted(async () => {
+  try {
+    reservations.value = await getReservationAll();
+  } catch(error: unknown) {
+    const err = error as Error;
+    toast({
+      title: "Something went wrong!",
+      description: err.message,
+    });
+  }
+})
 </script>
 
 <template>
-  <Card class="p-2">
+  <Card class="p-2 w-[50rem]">
     <CardHeader>
       <CardTitle>Your reservations</CardTitle>
       <CardDescription></CardDescription>
@@ -323,13 +345,33 @@ const onReservationSubmit = reservationForm.handleSubmit(
         </Dialog>
       </div>
 
-      <ScrollArea class="h-[200px] w-[350px] rounded-md border px-2">
-        Jokester began sneaking into the castle in the middle of the night and
-        leaving jokes all over the place: under the king's pillow, in his soup,
-        even in the royal toilet. The king was furious, but he couldn't seem to
-        stop Jokester. And then, one day, the people of the kingdom discovered
-        that the jokes left by Jokester were so funny that they couldn't help
-        but laugh. And once they started laughing, they couldn't stop.
+      <ScrollArea class="h-[200px] w-full rounded-md border px-2">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead class="w-fit">
+                  Branch
+                </TableHead>
+                <TableHead>Date & Time</TableHead>
+                <TableHead>Service</TableHead>
+                <TableHead class="text-center">
+                  Action
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="reservation in reservations" :key="reservation.ID">
+                <TableCell>{{ branches.find((b) => b.ID === reservation.branch_id)?.branch_name }}</TableCell>
+                <TableCell>{{ reservation.date }}</TableCell>
+                <TableCell>{{ reservation.service }}</TableCell>
+                <TableCell class="flex justify-center">
+                  <Button variant="outline" class="py-1 px-1 h-fit">
+                    <X :size="20" color="#ff0000" class="py-0" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
       </ScrollArea>
     </CardContent>
   </Card>
