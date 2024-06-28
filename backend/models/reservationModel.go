@@ -12,6 +12,6 @@ type Reservation struct {
 	PhoneNumber string    `gorm:"not null" json:"phone_number"`
 	Service     string    `gorm:"not null" json:"service"`
 	Date        time.Time `gorm:"not null" json:"date"`
-	UserID      uint
-	BranchID uint
+	UserID      uint `json:"user_id"`
+	BranchID uint `json:"branch_id"`
 }
