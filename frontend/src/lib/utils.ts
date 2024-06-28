@@ -31,10 +31,7 @@ export function generateAvailableTimes(openTime: string, closeTime: string, serv
   // Parse open and close times
   const openDate = parseTime(openTime);
   const closeDate = parseTime(closeTime);
-
-  console.log('Open Time:', openDate);
-  console.log('Close Time:', closeDate);
-
+  
   // Generate available times
   let currentTime = new Date(openDate);
 
@@ -49,4 +46,19 @@ export function generateAvailableTimes(openTime: string, closeTime: string, serv
   }
 
   return times;
+}
+
+export function getHourMinute(dateTimeString: string): string {
+  // Use regular expression to extract hour and minute (reliable for specific format)
+  const match = dateTimeString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/);
+
+  if (match) {
+    const hours = match[4].padStart(2, "0"); // Extract and format hours
+    const minutes = match[5].padStart(2, "0"); // Extract and format minutes
+    return `${hours}:${minutes}`;
+  } else {
+    // Handle invalid format (optional)
+    console.error("Invalid datetime string format", dateTimeString);
+    return ""; // Or throw an error
+  }
 }

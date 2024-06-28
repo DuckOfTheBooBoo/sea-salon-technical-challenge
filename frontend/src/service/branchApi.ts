@@ -1,5 +1,6 @@
 import apiClient from "./axiosApi";
 import { type Branch } from "@/types";
+import { getHourMinute } from "@/lib/utils";
 
 export const addBranch = async (values: Branch) => {
   try {
@@ -14,7 +15,11 @@ export const addBranch = async (values: Branch) => {
 export const getBranches = async (): Promise<Branch[]> => {
   try {
     const response = await apiClient.get("/branches");
-    return response.data as Branch[];
+    return response.data.map((branch: Branch) => ({ 
+      ...branch,
+      open_time: getHourMinute(branch.open_time),
+      close_time: getHourMinute(branch.close_time),
+     })) as Branch[];
   } catch (error: unknown) {
     console.error("Error fetching branches: ", error);
     throw new Error("Failed to fetch branches");
