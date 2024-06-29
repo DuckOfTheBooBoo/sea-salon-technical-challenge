@@ -71,7 +71,14 @@ func AuthLogIn(c *gin.Context) {
 		return
 	}
 
+	redirectPath := "/customer"
+
+	if user.Role == "Admin" {
+		redirectPath = "/admin"
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"token": accessToken,
+		"redirect_path": redirectPath,
 	})
 }
