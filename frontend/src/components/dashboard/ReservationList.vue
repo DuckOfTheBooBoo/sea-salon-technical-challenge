@@ -46,7 +46,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from 'lucide-vue-next';
+import { X } from "lucide-vue-next";
 import {
   Table,
   TableBody,
@@ -54,9 +54,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { addReservation, getReservationAll } from "@/service/reservationApi";
+import {
+  addReservation,
+  deleteReservation,
+  getReservationAll,
+} from "@/service/reservationApi";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import type { Branch, ReservationRequest, Reservation, Service } from "@/types";
 import { Input } from "@/components/ui/input";
 import { toTypedSchema } from "@vee-validate/zod";
@@ -64,7 +79,7 @@ import { useForm } from "vee-validate";
 import * as z from "zod";
 import { ref, computed, Ref, watch, onMounted } from "vue";
 import { useToast } from "@/components/ui/toast/use-toast";
-import { generateAvailableTimes } from '@/lib/utils'
+import { generateAvailableTimes, parseToLocalDateTime } from "@/lib/utils";
 
 const { toast } = useToast();
 
@@ -103,31 +118,46 @@ const dateValue = computed({
   set: (val) => val,
 });
 
-watch(() => reservationForm.values.branch, () => {
-  const branch = props.branches.find((b) => b.branch_name === reservationForm.values.branch);
-  if (branch) {
-    services.value = branch.services;
+watch(
+  () => reservationForm.values.branch,
+  () => {
+    const branch = props.branches.find(
+      (b) => b.branch_name === reservationForm.values.branch
+    );
+    if (branch) {
+      services.value = branch.services;
+    }
   }
-})
+);
 
 const availableTime: Ref<string[]> = ref([]);
 const timeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}$/;
 
+watch(
+  () => reservationForm.values.service,
+  () => {
+    const branch = props.branches.find(
+      (b) => b.branch_name === reservationForm.values.branch
+    );
+    const service = services.value.find(
+      (s) => s.service_name === reservationForm.values.service
+    );
 
-watch(() => reservationForm.values.service, () => {
-  const branch = props.branches.find((b) => b.branch_name === reservationForm.values.branch);
-  const service = services.value.find((s) => s.service_name === reservationForm.values.service);
-
-  if (branch !== undefined && service !== undefined) {
-    const openTime = timeRegex.test(branch.open_time) ? branch.open_time.substring(11) : branch.open_time;
-    const closeTime = timeRegex.test(branch.close_time) ? branch.close_time.substring(11) : branch.close_time;
-    availableTime.value = generateAvailableTimes(
-      openTime,
-      closeTime,
-      service.duration
-    )
+    if (branch !== undefined && service !== undefined) {
+      const openTime = timeRegex.test(branch.open_time)
+        ? branch.open_time.substring(11)
+        : branch.open_time;
+      const closeTime = timeRegex.test(branch.close_time)
+        ? branch.close_time.substring(11)
+        : branch.close_time;
+      availableTime.value = generateAvailableTimes(
+        openTime,
+        closeTime,
+        service.duration
+      );
+    }
   }
-})  
+);
 
 const isReservationFormOpen: Ref<boolean> = ref(false);
 
@@ -143,13 +173,14 @@ const onReservationSubmit = reservationForm.handleSubmit(
     };
 
     try {
-      await addReservation(requestBody);
+      const resp = await addReservation(requestBody);
       toast({
         title: "Success!",
         description: "Your reservation has been submitted",
       });
       reservationForm.resetForm();
       isReservationFormOpen.value = false;
+      reservations.value.push(resp)
     } catch (error: unknown) {
       const err = error as Error;
       toast({
@@ -163,14 +194,33 @@ const onReservationSubmit = reservationForm.handleSubmit(
 onMounted(async () => {
   try {
     reservations.value = await getReservationAll();
-  } catch(error: unknown) {
+  } catch (error: unknown) {
     const err = error as Error;
     toast({
       title: "Something went wrong!",
       description: err.message,
     });
   }
-})
+});
+
+const deleteReservationMethod = async (reservation: Reservation) => {
+  try {
+    await deleteReservation(reservation);
+    toast({
+      title: "Success!",
+      description: "Your reservation has been deleted",
+    });
+    reservations.value = reservations.value.filter(
+      (r) => r.ID !== reservation.ID
+    );
+  } catch (error: unknown) {
+    const err = error as Error;
+    toast({
+      title: "Something went wrong!",
+      description: err.message,
+    });
+  }
+};
 </script>
 
 <template>
@@ -346,32 +396,57 @@ onMounted(async () => {
       </div>
 
       <ScrollArea class="h-[200px] w-full rounded-md border px-2">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead class="w-fit">
-                  Branch
-                </TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Service</TableHead>
-                <TableHead class="text-center">
-                  Action
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow v-for="reservation in reservations" :key="reservation.ID">
-                <TableCell>{{ branches.find((b) => b.ID === reservation.branch_id)?.branch_name }}</TableCell>
-                <TableCell>{{ reservation.date }}</TableCell>
-                <TableCell>{{ reservation.service }}</TableCell>
-                <TableCell class="flex justify-center">
-                  <Button variant="outline" class="py-1 px-1 h-fit">
-                    <X :size="20" color="#ff0000" class="py-0" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead class="w-fit"> Branch </TableHead>
+              <TableHead>Date & Time</TableHead>
+              <TableHead>Service</TableHead>
+              <TableHead class="text-center"> Action </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="reservation in reservations" :key="reservation.ID">
+              <TableCell>{{
+                branches.find((b) => b.ID === reservation.branch_id)
+                  ?.branch_name
+              }}</TableCell>
+              <TableCell>{{ parseToLocalDateTime(reservation.date).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) }}</TableCell>
+              <TableCell>{{ reservation.service }}</TableCell>
+              <TableCell class="flex justify-center">
+                <AlertDialog>
+                  <AlertDialogTrigger as-child>
+                    <Button
+                      variant="outline"
+                      class="py-1 px-1 h-fit"
+                    >
+                      <X :size="20" color="#ff0000" class="py-0" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle
+                        >Are you absolutely sure?</AlertDialogTitle
+                      >
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will cancel your RSVP and remove the data from our
+                        database.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        @click="deleteReservationMethod(reservation)"
+                        class="bg-destructive"
+                        >Continue</AlertDialogAction
+                      >
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </ScrollArea>
     </CardContent>
   </Card>

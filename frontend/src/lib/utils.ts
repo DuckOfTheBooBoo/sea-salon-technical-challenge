@@ -61,3 +61,14 @@ export function getHourMinute(dateTimeString: string): string {
     return ""; // Or throw an error
   }
 }
+
+export function parseToLocalDateTime(dateTime: string): Date {
+  "2024-06-29T18:00:00Z"
+
+  const [date, time] = dateTime.split("T");
+  const [year, month, day] = date.split("-").map(Number);
+  const [hours, minutes, seconds] = time.replace("Z", "").split(":").map(Number);
+
+  const parsedDate = new Date(year, month - 1, day, hours, minutes, seconds);
+  return parsedDate;
+}
