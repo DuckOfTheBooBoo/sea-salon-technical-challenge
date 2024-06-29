@@ -30,7 +30,7 @@ const routes: RouteRecordRaw[] = [
         meta: {protected: true}
     },
     {
-        path: '/dashboard',
+        path: '/customer',
         name: 'customer-dashboard',
         component: CustomerDashboard,
         meta: {protected: true}

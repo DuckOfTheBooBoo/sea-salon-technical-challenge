@@ -34,19 +34,7 @@ const logInFormSchema = toTypedSchema(
     email: z.string().email({ message: "Invalid email address" }),
     password: z
       .string()
-      .min(8, { message: "Password must be at least 8 characters long" })
-      .regex(/[a-z]/, {
-        message: "Password must contain at least one lowercase letter",
-      })
-      .regex(/[A-Z]/, {
-        message: "Password must contain at least one uppercase letter",
-      })
-      .regex(/[0-9]/, {
-        message: "Password must contain at least one number",
-      })
-      .regex(/[@$!%*?&]/, {
-        message: "Password must contain at least one special character",
-      }),
+      .min(1, { message: "Password is required" })
   })
 );
 
@@ -62,7 +50,7 @@ const onLogInSubmit = logInForm.handleSubmit(async (values) => {
   try {
     const response: LogInResponse = await logIn(request);
     localStorage.setItem("token", response.token);
-    router.push({name: 'landing'})
+    router.push({path: response.redirect_path})
   } catch (error: unknown) {
     const err: AuthError = error as AuthError;
     if (err.code === HTTP_UNAUTHORIZED) {

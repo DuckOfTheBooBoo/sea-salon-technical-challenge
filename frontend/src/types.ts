@@ -33,6 +33,7 @@ export interface LogInRequest {
 
 export interface LogInResponse {
     token: string;
+    redirect_path: string;
 }
 
 export interface ErrorResponse {
