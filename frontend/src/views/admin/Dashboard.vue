@@ -27,6 +27,8 @@ const handleBranchEdit = (branch: Branch) => {
 
 const handleViewChange = (newView: string) => {
   currentView.value = newView;
+  // Prune Branch form fields populated by editing an existing branch
+  tempBranch.value = {} as Branch;
 };
 
 const handleNewBranch = (newBranch: Branch, oldBranch?: Branch) => {
