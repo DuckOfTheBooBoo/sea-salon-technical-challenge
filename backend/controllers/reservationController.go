@@ -100,3 +100,34 @@ func ReservationGetAll(c *gin.Context) {
 
 	c.JSON(http.StatusOK, reservations)
 }
+
+func ReservationDelete(c * gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	userClaim := c.MustGet("userClaims").(*utils.UserClaims)
+	reservationId := c.Param("id")
+
+	var reservation models.Reservation
+	if err := db.Where("id = ?", reservationId).First(&reservation).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": "Reservation not found",
+			})
+			return
+		}
+	}
+
+	if reservation.UserID != userClaim.ID {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	if err := db.Delete(&reservation).Error; err != nil {
+		c.Status(http.StatusInternalServerError)
+		log.Println(err.Error())
+		return
+	}
+
+	c.Status(http.StatusOK)
+}

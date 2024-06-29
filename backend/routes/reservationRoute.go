@@ -11,4 +11,5 @@ func ReservationRoute(route *gin.RouterGroup) {
 
 	reservation.GET("", middlewares.JWTMiddleware(), controllers.ReservationGetAll)
 	reservation.POST("", middlewares.JWTMiddleware(), controllers.ReservationCreate)
+	reservation.DELETE("/:id", middlewares.JWTMiddleware(), controllers.ReservationDelete)
 }
