@@ -81,3 +81,9 @@ export interface Branch extends Coordinate, GormModel {
     open_time: string;
     close_time: string;
 }
+
+export interface JWTPayload {
+    exp: number;
+    iat: number;
+    role: "Customer" | "Admin";
+}

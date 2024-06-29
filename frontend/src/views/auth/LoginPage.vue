@@ -49,7 +49,6 @@ const onLogInSubmit = logInForm.handleSubmit(async (values) => {
   };
   try {
     const response: LogInResponse = await logIn(request);
-    localStorage.setItem("token", response.token);
     router.push({path: response.redirect_path})
   } catch (error: unknown) {
     const err: AuthError = error as AuthError;

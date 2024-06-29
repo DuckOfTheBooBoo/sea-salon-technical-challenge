@@ -21,7 +21,7 @@ import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import * as z from "zod";
 import {SignUpRequest, SignUpResponse} from "@/types";
-import { addNewUser } from "@/service/authApi";
+import { addNewUser } from "@/service/userApi";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { AuthError } from "@/errors/auth";
 import { useRouter } from "vue-router";
