@@ -19,14 +19,10 @@ const activeSection: Ref<string> = ref('home')
 const options = {
   anchors: ['home', 'services', 'testimonials', 'contact'],
   licenseKey: 'gplv3-license',
-  afterLoad: () => console.log('after load'),
-  afterSlideLoad: () => console.log('after slide load'),
-  afterRender: () => console.log('after render')
-}
-
-const afterLoad = () => {
-  console.log("HAI")
-}
+  afterLoad: (origin, destination) => {
+    activeSection.value = destination.anchor;
+  },
+};
 
 // Service list
 const services: Service[] = [
