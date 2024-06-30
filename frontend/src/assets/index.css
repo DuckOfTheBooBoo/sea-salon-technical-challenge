@@ -76,3 +76,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer base {
+  @font-face {
+    font-family: 'Oleragie';
+    src: url('./fonts/Oleragie.otf') format('opentype');
+    font-style: normal;
+    font-weight: normal;
+  }
+}

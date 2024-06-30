@@ -26,11 +26,6 @@ onMounted(async () => {
 <template>
   <div class="flex w-screen h-screen justify-center items-center gap-2">
     <div class="flex">
-      <Calendar
-        class="rounded-lg border bg-card text-card-foreground shadow-sm"
-      />
-    </div>
-    <div class="flex">
       <ReservationList :branches="branches" />
     </div>
   </div>

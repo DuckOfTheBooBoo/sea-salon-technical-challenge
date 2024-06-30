@@ -25,6 +25,7 @@ module.exports = {
     },
     fontFamily: {
       sans: ['"Inter"', 'sans-serif'],
+      oleragie: ['"Oleragie"', 'sans-serif'],
     },
     extend: {
       colors: {

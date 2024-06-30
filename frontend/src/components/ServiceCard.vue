@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import {Button} from '@/components/ui/button'
 defineProps<{
     src: string,
     src2: string | undefined,
@@ -9,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-    <div class="flex flex-col rounded-xl border overflow-hidden w-[360px] shadow-xl">
+    <div class="flex flex-col rounded-xl border overflow-hidden w-[360px] shadow-xl hover:translate-y-[-1rem] transition-all">
         <img v-if="!src2" :src="src" alt="" class="w-full h-96 object-cover">
         <div v-else class="flex">
             <img class="w-1/2 h-96 object-cover" :src="src" alt="">
@@ -21,8 +20,6 @@ defineProps<{
             <!-- Description -->
             <p class="text-center">{{ description }}</p>
         </div>
-
-        <Button class="w-fit m-auto mb-2">Learn more</Button>
     </div>
 </template>
 

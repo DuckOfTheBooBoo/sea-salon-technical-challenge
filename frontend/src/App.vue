@@ -4,13 +4,13 @@ import Toaster from "@/components/ui/toast/Toaster.vue";
 
 <template>
   <Toaster />
-  <nav>
+  <!-- <nav>
     <RouterLink to="/">Home</RouterLink>
     <RouterLink to="/login">Login</RouterLink>
     <RouterLink to="/signup">Sign Up</RouterLink>
     <RouterLink to="/admin">Admin</RouterLink>
-    <RouterLink to="/dashboard">Customer</RouterLink>
-  </nav>
+    <RouterLink to="/customer">Customer</RouterLink>
+  </nav> -->
   <main>
     <RouterView />
   </main>
