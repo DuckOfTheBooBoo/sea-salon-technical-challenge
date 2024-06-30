@@ -18,7 +18,9 @@ func JWTMiddleware() gin.HandlerFunc {
 		userClaims, err := utils.ParseToken(tokenString)
 
 		if err != nil {
-			c.Status(http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": err.Error(),
+			})
 			c.Abort()
 			return
 		}

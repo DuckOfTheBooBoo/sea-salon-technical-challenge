@@ -31,7 +31,7 @@ const props = defineProps<{toast: Function}>();
 const reviewFormSchema = toTypedSchema(
   z.object({
     name: z.string().min(1, 'Name is required'),
-    rating: z.number().min(1).max(5),
+    rating: z.number().min(1, 'Rating is required').max(5),
     comment: z.string().min(1, 'Comment is required'),
   })
 );
@@ -83,8 +83,8 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="h-[530px] m-h-[530px]" id="reviews">
-    <h1 class="text-center text-4xl my-10 font-semibold">
+  <div class="m-h-[530px] py-10" id="reviews" >
+    <h1 class="text-center text-4xl my-10 font-semibold text-white">
       What Others Said About Us
     </h1>
     <div class="flex px-32 w-full justify-between gap-4">
