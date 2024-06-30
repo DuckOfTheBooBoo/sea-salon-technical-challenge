@@ -18,6 +18,7 @@
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "vue": "^3.4.21",
+    "vue-fullpage.js": "^0.2.17",
     "vue3-google-map": "^0.20.0"
   },
   "devDependencies": {
