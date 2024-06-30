@@ -5,8 +5,7 @@ import SignUpPage from '@/views/auth/SignUpPage.vue';
 import AdminDashboard from '@/views/admin/Dashboard.vue';
 import CustomerDashboard from '@/views/customer/Dashboard.vue';
 import ForbiddenPage from '@/views/ForbiddenPage.vue';
-import { getUser } from '@/service/userApi';
-import type { User, JWTPayload } from '@/types';
+import type { JWTPayload } from '@/types';
 import { jwtDecode } from 'jwt-decode';
 
 const routes: RouteRecordRaw[] = [
@@ -46,24 +45,6 @@ const routes: RouteRecordRaw[] = [
 
 const router = createRouter({ history: createWebHistory(), routes });
 
-// We could use GET /api/users to check if token is valid, the endpoint itself will return a 401 if token is invalid, else returns the user information
-// const checkTokenValidation = async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): Promise<void> => {
-//     try {
-//         const user: User = await getUser()
-        
-//         if (!isValid && to.name !== 'login' && to.name !== 'signup') {
-//           next({ name: 'login' });
-//         } else if (isValid && (to.name === 'login' || to.name === 'signup')) {
-//           next({ name: 'explorer-files' });
-//         } else {
-//           next();
-//         }
-//       } catch (error: unknown) {
-//         console.error('Router Token Check Error:', error);
-//         next(false);
-//     }
-//   }  
-
 router.beforeEach(async (to, from, next) => {
   try {
     let isValid: boolean = localStorage.getItem('token') ? true : false;
@@ -91,10 +72,9 @@ router.beforeEach(async (to, from, next) => {
 
     let redirectTo: string | undefined;
 
-    if (!isValid && to.name !== 'login' && to.name !== 'signup') {
+    if (!isValid && to.name !== 'login' && to.name !== 'signup' && to.name !== 'landing') {
         redirectTo = 'login';
       } else if (isValid && (to.name === 'login' || to.name === 'signup')) {
-        console.log('HAI')
         switch (decoded.role) {
           case 'Customer':
             redirectTo = 'customer-dashboard';
@@ -106,7 +86,7 @@ router.beforeEach(async (to, from, next) => {
             console.error('Unexpected role or missing decoded.Role');
             break;
         }
-      } else if (isValid && to.name === 'admin-dashboard' && decoded.Role !== 'Admin') {
+      } else if (isValid && to.name === 'admin-dashboard' && decoded.role !== 'Admin') {
         redirectTo = 'forbidden';
       }
 
