@@ -5,6 +5,7 @@ import SignUpPage from '@/views/auth/SignUpPage.vue';
 import AdminDashboard from '@/views/admin/Dashboard.vue';
 import CustomerDashboard from '@/views/customer/Dashboard.vue';
 import ForbiddenPage from '@/views/ForbiddenPage.vue';
+import NotFoundPage from '@/views/NotFoundPage.vue';
 import type { JWTPayload } from '@/types';
 import { jwtDecode } from 'jwt-decode';
 
@@ -40,43 +41,51 @@ const routes: RouteRecordRaw[] = [
         path: '/forbidden',
         name: 'forbidden',
         component: ForbiddenPage
+    },
+    {
+      path: '/:catchAll(.*)',
+      name: 'not-found',
+      component: NotFoundPage
     }
 ]
 
 const router = createRouter({ history: createWebHistory(), routes });
 
 router.beforeEach(async (to, from, next) => {
-  if (to.hash !== "" || from.hash !== "" || to.name === 'landing') {next();return;}
-  
+  console.log(to, from);
+
+  // Allow navigation if hash is present or route is 'landing'
+  if (to.hash !== "" || from.hash !== "" || to.name === 'landing') {
+    next();
+    return;
+  }
+
   try {
-    let isValid: boolean = localStorage.getItem('token') ? true : false;
-    // decode jwt
-    const token: string | null = localStorage.getItem("token")
+    const token: string | null = localStorage.getItem("token");
+    let isValid = false;
+    let decoded: any;
 
-    console.log(token)
-
-    if (!token) {
-        next({ name: 'login' });
-        return
-    }
-
-    const decoded = jwtDecode<JWTPayload>(token);
-    
-    console.log(decoded)
-
-    if (decoded.exp !== undefined) {
-        if (decoded.exp * 1000 > Date.now()) {
-            isValid = true;
-        } else {
-            isValid = false;
-        }
+    // Check if the token exists and is valid
+    if (token) {
+      decoded = jwtDecode<JWTPayload>(token);
+      if (decoded.exp && decoded.exp * 1000 > Date.now()) {
+        isValid = true;
+      }
     }
 
     let redirectTo: string | undefined;
 
-    if (!isValid && to.name !== 'login' && to.name !== 'signup' && to.name !== 'landing') {
+    if (!isValid) {
+      // Allow access to 'login' and 'signup' routes for unauthenticated users
+      if (to.name === 'login' || to.name === 'signup') {
+        next();
+        return;
+      } else {
         redirectTo = 'login';
-      } else if (isValid && (to.name === 'login' || to.name === 'signup')) {
+      }
+    } else {
+      // Handle redirection for authenticated users
+      if (to.name === 'login' || to.name === 'signup') {
         switch (decoded.role) {
           case 'Customer':
             redirectTo = 'customer-dashboard';
@@ -88,9 +97,10 @@ router.beforeEach(async (to, from, next) => {
             console.error('Unexpected role or missing decoded.Role');
             break;
         }
-      } else if (isValid && to.name === 'admin-dashboard' && decoded.role !== 'Admin') {
+      } else if (to.name === 'admin-dashboard' && decoded.role !== 'Admin') {
         redirectTo = 'forbidden';
       }
+    }
 
     if (redirectTo) {
       next({ name: redirectTo });
