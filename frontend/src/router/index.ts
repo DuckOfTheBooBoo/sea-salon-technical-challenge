@@ -46,6 +46,8 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({ history: createWebHistory(), routes });
 
 router.beforeEach(async (to, from, next) => {
+  if (to.hash !== "" || from.hash !== "" || to.name === 'landing') next()
+  
   try {
     let isValid: boolean = localStorage.getItem('token') ? true : false;
     // decode jwt
