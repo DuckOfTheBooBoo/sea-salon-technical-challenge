@@ -95,7 +95,7 @@ onBeforeMount(async () => {
           </CardHeader>
           <CardContent>
             <FormField v-slot="{ componentField }" name="name">
-              <FormItem>
+              <FormItem v-auto-animate>
                 <FormLabel>Your name</FormLabel>
                 <FormControl>
                   <Input
@@ -108,7 +108,7 @@ onBeforeMount(async () => {
               </FormItem>
             </FormField>
             <FormField v-slot="{ componentField }" name="rating">
-              <FormItem>
+              <FormItem v-auto-animate>
                 <FormLabel>Your rating</FormLabel>
                 <FormControl>
                   <StarRating
@@ -121,7 +121,7 @@ onBeforeMount(async () => {
               </FormItem>
             </FormField>
             <FormField v-slot="{ componentField }" name="comment">
-              <FormItem>
+              <FormItem v-auto-animate>
                 <FormLabel>Comment</FormLabel>
                 <FormControl>
                   <Input

@@ -76,7 +76,7 @@ const onLogInSubmit = logInForm.handleSubmit(async (values) => {
         </CardHeader>
         <CardContent>
           <FormField v-slot="{ componentField }" name="email">
-            <FormItem>
+            <FormItem v-auto-animate>
               <FormLabel>Your e-mail</FormLabel>
               <FormControl>
                 <Input
@@ -89,7 +89,7 @@ const onLogInSubmit = logInForm.handleSubmit(async (values) => {
             </FormItem>
           </FormField>
           <FormField v-slot="{ componentField }" name="password">
-            <FormItem>
+            <FormItem v-auto-animate>
               <FormLabel>Your password</FormLabel>
               <FormControl>
                 <Input

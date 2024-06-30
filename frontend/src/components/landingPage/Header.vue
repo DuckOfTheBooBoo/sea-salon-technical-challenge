@@ -21,7 +21,9 @@ watch(() => props.activeSection, () => {
     </div>
 
     <div>
-      <Button variant="ghost" :class="{'active-nav': active}" class="text-white bg-transparent active">Become a member</Button>
+      <RouterLink to='/signup'>
+        <Button variant="ghost" :class="{'active-nav': active}" class="text-white bg-transparent active">Become a member</Button>
+      </RouterLink>
     </div>
   </nav>
 </template>

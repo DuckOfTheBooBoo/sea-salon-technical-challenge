@@ -113,7 +113,7 @@ const onSignUpSubmit = signUpForm.handleSubmit(async (values) => {
               name="firstName"
               class="w-1/2"
             >
-              <FormItem>
+              <FormItem v-auto-animate>
                 <FormLabel>First name</FormLabel>
                 <FormControl>
                   <Input
@@ -130,7 +130,7 @@ const onSignUpSubmit = signUpForm.handleSubmit(async (values) => {
               name="lastName"
               class="w-1/2"
             >
-              <FormItem>
+              <FormItem v-auto-animate>
                 <FormLabel>Last name</FormLabel>
                 <FormControl>
                   <Input
@@ -144,7 +144,7 @@ const onSignUpSubmit = signUpForm.handleSubmit(async (values) => {
             </FormField>
           </div>
           <FormField v-slot="{ componentField }" name="email">
-            <FormItem>
+            <FormItem v-auto-animate>
               <FormLabel>Your e-mail</FormLabel>
               <FormControl>
                 <Input
@@ -157,7 +157,7 @@ const onSignUpSubmit = signUpForm.handleSubmit(async (values) => {
             </FormItem>
           </FormField>
           <FormField v-slot="{ componentField }" name="phoneNumber">
-            <FormItem>
+            <FormItem v-auto-animate>
               <FormLabel>Your active phone number</FormLabel>
               <FormControl>
                 <Input
@@ -171,7 +171,7 @@ const onSignUpSubmit = signUpForm.handleSubmit(async (values) => {
             </FormItem>
           </FormField>
           <FormField v-slot="{ componentField }" name="password">
-            <FormItem>
+            <FormItem v-auto-animate>
               <FormLabel>Your password</FormLabel>
               <FormControl>
                 <Input
@@ -184,7 +184,7 @@ const onSignUpSubmit = signUpForm.handleSubmit(async (values) => {
             </FormItem>
           </FormField>
           <FormField v-slot="{ componentField }" name="passwordConfirm">
-            <FormItem>
+            <FormItem v-auto-animate>
               <FormLabel>Confirm your password</FormLabel>
               <FormControl>
                 <Input
