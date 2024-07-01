@@ -1,4 +1,6 @@
+import { JWTPayload } from '@/types'
 import { type ClassValue, clsx } from 'clsx'
+import { jwtDecode } from 'jwt-decode'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
@@ -71,4 +73,19 @@ export function parseToLocalDateTime(dateTime: string): Date {
 
   const parsedDate = new Date(year, month - 1, day, hours, minutes, seconds);
   return parsedDate;
+}
+
+export function isAuthenticated(): JWTPayload | null{
+  const token = localStorage.getItem("token")
+
+  if(!token) {
+    return null;
+  }
+
+  const decoded = jwtDecode<JWTPayload>(token)
+  if (decoded.exp && decoded.exp * 1000 > Date.now()) {
+    return decoded;
+  }
+
+  return null;
 }

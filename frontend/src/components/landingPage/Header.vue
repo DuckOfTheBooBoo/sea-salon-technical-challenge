@@ -1,13 +1,23 @@
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
 const props = defineProps<{class?: string, activeSection: string}>()
-import { ref, onMounted, watch } from 'vue'
+import { ref, onBeforeMount, watch } from 'vue'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { JWTPayload } from "@/types";
+import {isAuthenticated as isAuthenticatedMethod} from '@/lib/utils'
 
-const active = ref(props.activeSection === 'services' || props.activeSection === 'contact')
-
+const active = ref<boolean>(props.activeSection === 'services' || props.activeSection === 'contact')
+const auth = ref<JWTPayload>({} as JWTPayload)
 
 watch(() => props.activeSection, () => {
   active.value = props.activeSection === 'services' || props.activeSection === 'contact'
+})
+
+onBeforeMount(() => {
+  const isAuthenticated: JWTPayload | null = isAuthenticatedMethod()
+  if (isAuthenticated) {
+    auth.value = isAuthenticated;
+  }
 })
 </script>
 
@@ -21,7 +31,19 @@ watch(() => props.activeSection, () => {
     </div>
 
     <div>
-      <RouterLink to='/signup'>
+      <RouterLink to="/customer" v-if="auth && auth.role === 'Customer'">
+        <Avatar>
+            <AvatarImage :src="'https://api.dicebear.com/9.x/initials/svg?seed='+auth.full_name" alt="" />
+            <AvatarFallback>{{auth.full_name}}</AvatarFallback>
+        </Avatar>
+      </RouterLink>
+      <RouterLink to="/admin" v-else-if="auth && auth.role === 'Admin'">
+        <Avatar>
+            <AvatarImage :src="'https://api.dicebear.com/9.x/initials/svg?seed='+auth.full_name" alt="" />
+            <AvatarFallback>{{auth.full_name}}</AvatarFallback>
+        </Avatar>
+      </RouterLink>
+      <RouterLink to='/signup' v-else>
         <Button variant="ghost" :class="{'active-nav': active}" class="text-white bg-transparent active">Become a member</Button>
       </RouterLink>
     </div>

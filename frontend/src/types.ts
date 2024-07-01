@@ -86,4 +86,6 @@ export interface JWTPayload {
     exp: number;
     iat: number;
     role: "Customer" | "Admin";
+    ID: number;
+    full_name: string;
 }
