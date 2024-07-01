@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import ServiceCard from "@/components/ServiceCard.vue";
-import { Icon } from "@iconify/vue";
+import {Phone} from 'lucide-vue-next';
 import { useToast } from "@/components/ui/toast/use-toast";
 import LandingHeader from "@/components/landingPage/Header.vue";
 import LandingTestimonial from "@/components/landingPage/Testimonial.vue";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {Ref, ref} from 'vue'
 
 interface Service {
@@ -91,32 +92,24 @@ const services: Service[] = [
 
     <div class="section" data-anchor="contact">
         <h1 class="text-center text-4xl mb-3 font-semibold">Contact Us</h1>
-        <div class="flex gap-5 justify-center">
+        <p class="text-center mb-12">Got questions? We're all ears and excited to help! Reach out anytime!</p>
+        <div class="flex gap-10 justify-center">
           <div class="">
-            <img src="" alt="" class="rounded-full" />
+            <img src="@/assets/images/thomas-crop.jpeg" alt="" class="min-w-[10rem] max-w-[20rem] rounded-full" />
+            
+            <p class="text-center text-xl font-semibold mt-4">Thomas</p>
             <p class="text-center">
-              <Icon icon="mdi:account" class="inline" />Thomas
-            </p>
-            <p class="text-center">
-              <Icon icon="ph:phone-fill" class="inline" />08123456789
+              <Phone class="inline w-4 h-4 align-middle mr-2" />08123456789
             </p>
           </div>
           <div class="">
-            <img src="" alt="" />
+            <img src="@/assets/images/sekar-crop.jpeg" alt="" class="min-w-[10rem] max-w-[20rem] rounded-full" />
+            <p class="text-center text-xl font-semibold mt-4">Sekar</p>
             <p class="text-center">
-              <Icon icon="mdi:account" class="inline" />Sekar
-            </p>
-            <p class="text-center">
-              <Icon icon="ph:phone-fill" class="inline" />08164829372
+              <Phone class="inline w-4 h-4 align-middle mr-2" />08164829372
             </p>
           </div>
         </div>
     </div>
   </full-page>
 </template>
-
-<style scoped>
-/* .gradient {
-  background: linear-gradient(to right, rgba(255,255,255,1), #373735);
-} */
-</style>
