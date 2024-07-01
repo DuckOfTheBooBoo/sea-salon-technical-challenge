@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
 const props = defineProps<{ class?: string; activeSection: string }>();
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { JWTPayload } from "@/types";
 import { isAuthenticated as isAuthenticatedMethod } from "@/lib/utils";
 import { Menu } from "lucide-vue-next";
+import { useRouter } from "vue-router";
 import {
   Sheet,
   SheetContent,
@@ -14,6 +15,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const active = ref<boolean>(
   props.activeSection === "services" || props.activeSection === "contact"
@@ -27,6 +34,30 @@ watch(
       props.activeSection === "services" || props.activeSection === "contact";
   }
 );
+
+const isAuthenticated = computed(() => Object.keys(auth.value).length > 0);
+const userRoute = computed(() => {
+  if (auth.value.role === "Admin") {
+    return "/admin";
+  } else if (auth.value.role === "Customer") {
+    return "/customer";
+  }
+  return "/";
+});
+const avatarUrl = computed(
+  () => `https://api.dicebear.com/9.x/initials/svg?seed=${auth.value.full_name}`
+);
+
+const router = useRouter();
+
+const goTo = (path: string): void => {
+  router.push(path);
+}
+
+const logout = (): void => {
+  localStorage.removeItem("token");
+  router.go(0);
+};
 
 onMounted(() => {
   const payload: JWTPayload | null = isAuthenticatedMethod();
@@ -104,56 +135,55 @@ onMounted(() => {
             >
           </SheetClose>
 
-          <RouterLink to="/customer" v-if="Object.keys(auth).length > 0 && auth.role === 'Customer'">
+          <RouterLink
+            to="/customer"
+            v-if="Object.keys(auth).length > 0 && auth.role === 'Customer'"
+          >
             <p class="text-right text-primary pt-1 text-xl">Dashboard</p>
           </RouterLink>
-          <RouterLink to="/admin" v-else-if="Object.keys(auth).length > 0 && auth.role === 'Admin'">
+          <RouterLink
+            to="/admin"
+            v-else-if="Object.keys(auth).length > 0 && auth.role === 'Admin'"
+          >
             <p class="text-right text-primary pt-1 text-xl">Dashboard</p>
           </RouterLink>
           <RouterLink to="/signup" v-else>
             <p class="text-right text-primary pt-1 text-xl">Become a member</p>
           </RouterLink>
+
+          <div @click="logout" v-if="isAuthenticated">
+            <p class="text-right pt-1 text-destructive text-xl">Log Out</p>
+          </div>
         </SheetHeader>
       </SheetContent>
     </Sheet>
 
     <div class="hidden sm:pr-2 sm:block">
-      <RouterLink
-        to="/customer"
-        v-if="Object.keys(auth).length > 0 && auth.role === 'Customer'"
-      >
-        <Avatar>
-          <AvatarImage
-            :src="
-              'https://api.dicebear.com/9.x/initials/svg?seed=' + auth.full_name
-            "
-            alt=""
-          />
-          <AvatarFallback>{{ auth.full_name }}</AvatarFallback>
-        </Avatar>
-      </RouterLink>
-      <RouterLink
-        to="/admin"
-        v-else-if="Object.keys(auth).length > 0 && auth.role === 'Admin'"
-      >
-        <Avatar>
-          <AvatarImage
-            :src="
-              'https://api.dicebear.com/9.x/initials/svg?seed=' + auth.full_name
-            "
-            alt=""
-          />
-          <AvatarFallback>{{ auth.full_name }}</AvatarFallback>
-        </Avatar>
-      </RouterLink>
-      <RouterLink to="/signup" v-else>
-        <Button
-          variant="ghost"
-          :class="{ 'active-nav': active }"
-          class="text-white bg-transparent active"
-          >Become a member</Button
-        >
-      </RouterLink>
+      <template v-if="isAuthenticated">
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Avatar class="hover:cursor-pointer">
+              <AvatarImage :src="avatarUrl" alt="" />
+              <AvatarFallback>{{ auth.full_name }}</AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem class="hover:cursor-pointer" @click="goTo(userRoute)">Dashboard</DropdownMenuItem>
+            <DropdownMenuItem class="hover:cursor-pointer text-destructive" @click="logout">Log Out</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </template>
+      <template v-else>
+        <RouterLink to="/signup">
+          <Button
+            variant="ghost"
+            :class="{ 'active-nav': active }"
+            class="text-white bg-transparent active"
+          >
+            Become a member
+          </Button>
+        </RouterLink>
+      </template>
     </div>
   </nav>
 </template>
