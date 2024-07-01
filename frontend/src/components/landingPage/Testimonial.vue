@@ -83,12 +83,12 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="m-h-[530px] py-10" id="reviews" >
-    <h1 class="text-center text-4xl my-10 font-semibold text-white">
+  <div class="w-full py-4 sm:py-10" id="reviews" >
+    <h1 class="text-center text-3xl sm:text-4xl my-10 font-semibold text-white">
       What Others Said About Us
     </h1>
-    <div class="flex px-32 w-full justify-between gap-4">
-      <Card class="w-2/3">
+    <div class="flex flex-col-reverse sm:flex-row px-4 sm:px-32 w-full justify-between gap-4">
+      <Card class="w-full sm:w-2/3">
         <form @submit.prevent="onReviewSubmit">
           <CardHeader>
             <CardTitle>Leave a review</CardTitle>
@@ -135,7 +135,7 @@ onBeforeMount(async () => {
             </FormField>
           </CardContent>
           <CardFooter>
-            <Button type="submit">Submit</Button>
+            <Button class="w-full" type="submit">Submit</Button>
           </CardFooter>
         </form>
       </Card>
