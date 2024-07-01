@@ -79,16 +79,17 @@ onMounted(async () => {
 
 <template>
   <div class="flex flex-col h-screen w-screen">
-    <div class="py-2 px-3">
+    <div class="py-2 px-3 bg-primary text-white">
       <h1><span class="font-oleragie font-semibold text-[0.5rem]">SEA Salon</span> Admin Dashboard</h1>
     </div>
-    <div class="flex w-full h-full flex-col-reverse sm:flex-row">
+    <div class="flex w-full h-full flex-col-reverse sm:flex-row rounded-md">
       <div class="w-full h-1/2 sm:w-1/3 px-3 max-h-full">
         <div
           class="w-full h-full flex flex-col justify-between pb-2"
           v-if="currentView === 'branches'"
         >
-          <BranchList 
+          <BranchList
+            
             :branches="branches" 
             @branch:focus="handleCenterChange" 
             @branch:delete="handleBranchDelete"

@@ -188,7 +188,7 @@ onMounted(() => {
       </Button>
       <h1 class="text-xl font-bold">Add new branch</h1>
     </div>
-    <ScrollArea class="rounded-md w-full h-full">
+    <ScrollArea class="rounded-md w-full h-[35rem]">
       <form @submit.prevent="onBranchFormSubmit" class="">
         <FormField v-slot="{ componentField }" name="name">
           <FormItem>
