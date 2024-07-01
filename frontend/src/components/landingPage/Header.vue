@@ -37,14 +37,14 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <nav :class="`flex w-screen z-10 justify-between p-3 fixed ${props.class}`">
+  <nav :class="`flex w-screen z-10 justify-between sm:justify-start p-3 fixed ${props.class}`">
     <a
       :class="{ 'active-nav': active }"
       class="nav-link text-white text-[10px] text-nowrap sm:text-xs font-oleragie pt-5 sm:pt-4 mr-2 font-[900]"
       href="#home"
       >SEA Salon</a
     >
-    <div class="hidden sm:flex gap-5">
+    <div class="hidden sm:flex sm:ml-5 gap-5">
       <a
         :class="{ 'active-nav': active }"
         class="nav-link text-white pt-1 text-xl"
@@ -65,12 +65,12 @@ onBeforeMount(() => {
       >
     </div>
 
-    <Sheet class="sm:hidden">
+    <Sheet>
       <SheetTrigger as-child>
         <Button
           variant="ghost"
           :class="{ 'active-nav': active }"
-          class="text-white bg-transparent m-0 p-0 mr-2"
+          class="sm:hidden text-white bg-transparent m-0 p-0 mr-2"
         >
           <Menu />
         </Button>
