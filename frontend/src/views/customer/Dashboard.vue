@@ -24,9 +24,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex w-screen h-screen justify-center items-center gap-2">
-    <div class="flex">
-      <ReservationList :branches="branches" />
-    </div>
+  <div class="flex w-screen h-screen gap-2">
+    <ReservationList :branches="branches" />
   </div>
 </template>

@@ -224,16 +224,70 @@ const deleteReservationMethod = async (reservation: Reservation) => {
 </script>
 
 <template>
-  <Card class="p-2 w-[50rem]">
+  <Card class="w-full">
     <CardHeader>
       <CardTitle>Your reservations</CardTitle>
       <CardDescription></CardDescription>
     </CardHeader>
     <CardContent>
-      <div class="flex justify-end">
-        <Dialog v-model:open="isReservationFormOpen">
+
+      <ScrollArea class="h-full sm:h-[200px] w-full rounded-md border px-2">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead class="w-fit text-xs sm:text-base">Branch</TableHead>
+              <TableHead class="text-xs sm:text-base">Date & Time</TableHead>
+              <TableHead class="text-xs sm:text-base">Service</TableHead>
+              <TableHead class="text-center text-xs sm:text-base"> Action </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="reservation in reservations" :key="reservation.ID">
+              <TableCell>{{
+                branches.find((b) => b.ID === reservation.branch_id)
+                  ?.branch_name
+              }}</TableCell>
+              <TableCell>{{ parseToLocalDateTime(reservation.date).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) }}</TableCell>
+              <TableCell>{{ reservation.service }}</TableCell>
+              <TableCell class="flex justify-center">
+                <AlertDialog>
+                  <AlertDialogTrigger as-child>
+                    <Button
+                      variant="outline"
+                      class="py-1 px-1 h-fit"
+                    >
+                      <X :size="20" color="#ff0000" class="py-0" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle
+                        >Are you absolutely sure?</AlertDialogTitle
+                      >
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will cancel your RSVP and remove the data from our
+                        database.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        @click="deleteReservationMethod(reservation)"
+                        class="bg-destructive"
+                        >Continue</AlertDialogAction
+                      >
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </ScrollArea>
+
+      <Dialog v-model:open="isReservationFormOpen">
           <DialogTrigger as-child>
-            <Button variant="outline">Make reservation</Button>
+            <Button variant="outline" class="w-full">Make reservation</Button>
           </DialogTrigger>
           <DialogContent>
             <form @submit.prevent="onReservationSubmit">
@@ -393,61 +447,6 @@ const deleteReservationMethod = async (reservation: Reservation) => {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
-
-      <ScrollArea class="h-[200px] w-full rounded-md border px-2">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead class="w-fit"> Branch </TableHead>
-              <TableHead>Date & Time</TableHead>
-              <TableHead>Service</TableHead>
-              <TableHead class="text-center"> Action </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="reservation in reservations" :key="reservation.ID">
-              <TableCell>{{
-                branches.find((b) => b.ID === reservation.branch_id)
-                  ?.branch_name
-              }}</TableCell>
-              <TableCell>{{ parseToLocalDateTime(reservation.date).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) }}</TableCell>
-              <TableCell>{{ reservation.service }}</TableCell>
-              <TableCell class="flex justify-center">
-                <AlertDialog>
-                  <AlertDialogTrigger as-child>
-                    <Button
-                      variant="outline"
-                      class="py-1 px-1 h-fit"
-                    >
-                      <X :size="20" color="#ff0000" class="py-0" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle
-                        >Are you absolutely sure?</AlertDialogTitle
-                      >
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will cancel your RSVP and remove the data from our
-                        database.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        @click="deleteReservationMethod(reservation)"
-                        class="bg-destructive"
-                        >Continue</AlertDialogAction
-                      >
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </ScrollArea>
     </CardContent>
   </Card>
 </template>
