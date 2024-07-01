@@ -56,6 +56,7 @@ func AuthLogIn(c *gin.Context) {
 	userClaim := utils.UserClaims{
 		ID: user.ID,
 		Role: user.Role,
+		FullName: user.FullName,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  time.Now().Unix(),
 			ExpiresAt: time.Now().Add(time.Minute * 60).Unix(),
