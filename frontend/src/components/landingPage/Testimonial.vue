@@ -88,7 +88,7 @@ onBeforeMount(async () => {
       What Others Said About Us
     </h1>
     <div class="flex flex-col-reverse sm:flex-row px-4 sm:px-32 w-full justify-between gap-4">
-      <Card class="w-full sm:w-2/3 dark">
+      <Card class="w-full sm:w-2/3">
         <form @submit.prevent="onReviewSubmit">
           <CardHeader>
             <CardTitle>Leave a review</CardTitle>
@@ -139,7 +139,7 @@ onBeforeMount(async () => {
           </CardFooter>
         </form>
       </Card>
-      <Card class="w-full dark">
+      <Card class="w-full">
         <CardHeader>
           <CardTitle>Testimonials</CardTitle>
         </CardHeader>
