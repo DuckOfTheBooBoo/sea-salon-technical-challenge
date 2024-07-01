@@ -88,7 +88,7 @@ watch(
 
 const handleServiceInput = (values: string[]) => {
   branchForm.setFieldValue("services", values);
-}
+};
 
 const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
   const request = {
@@ -98,11 +98,16 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
     lng: values.lng,
     open_time: values.openTime,
     close_time: values.closeTime,
-    services: values.services.map((service: string) => service.replace(' ', '-').toLowerCase()),
+    services: values.services.map((service: string) =>
+      service.replace(" ", "-").toLowerCase()
+    ),
   };
 
   // Update
-  if (props.branchData !== undefined && Object.keys(props.branchData).length > 0) {
+  if (
+    props.branchData !== undefined &&
+    Object.keys(props.branchData).length > 0
+  ) {
     try {
       const resp: Branch = await updateBranch(props.branchData, request);
       emit("update:branch", resp, props.branchData);
@@ -120,7 +125,7 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
       });
     }
 
-    return
+    return;
   }
 
   try {
@@ -142,171 +147,196 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
 });
 
 onMounted(() => {
-  if (props.branchData !== undefined && Object.keys(props.branchData).length > 0) {
+  if (
+    props.branchData !== undefined &&
+    Object.keys(props.branchData).length > 0
+  ) {
     branchForm.setFieldValue("name", props.branchData.branch_name);
     branchForm.setFieldValue("address", props.branchData.branch_address);
     branchForm.setFieldValue("lat", props.branchData.lat);
     branchForm.setFieldValue("lng", props.branchData.lng);
-    branchForm.setFieldValue("openTime", props.branchData.open_time.substring(0, 5));
-    branchForm.setFieldValue("closeTime", props.branchData.close_time.substring(0, 5));
-    branchForm.setFieldValue("services", props.branchData.services.map((s) => s.service_name));
+    branchForm.setFieldValue(
+      "openTime",
+      props.branchData.open_time.substring(0, 5)
+    );
+    branchForm.setFieldValue(
+      "closeTime",
+      props.branchData.close_time.substring(0, 5)
+    );
+    branchForm.setFieldValue(
+      "services",
+      props.branchData.services.map((s) => s.service_name)
+    );
   }
-})
+});
 </script>
 
 <template>
-  <div class="flex items-center gap-2">
-    <Button
-      @click="() => {
-        emit('update:view', 'branches')
-        branchForm.resetForm()
-      }"
-      class="rounded-full w-fit h-fit"
-      variant="ghost"
-    >
-      <ArrowLeft class="w-fit h-fit" />
-    </Button>
-    <h1 class="text-xl font-bold">Add new branch</h1>
-  </div>
-  <ScrollArea class="rounded-md h-[560px]">
-    <form @submit.prevent="onBranchFormSubmit" class="px-2">
-      <FormField v-slot="{ componentField }" name="name">
-        <FormItem>
-          <FormLabel>Branch name</FormLabel>
-          <FormControl>
-            <Input
-              type="text"
-              placeholder="Enter the new branch name"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormDescription class="w-fit text-xs">
-            e.g. Branch-Pondok Indah Mall II
-          </FormDescription>
-          <FormMessage class="text-xs h-4" />
-        </FormItem>
-      </FormField>
-      <FormField v-slot="{ componentField }" name="address">
-        <FormItem>
-          <FormLabel> Branch address </FormLabel>
-          <FormControl>
-            <Textarea
-              placeholder="Enter the branch's address details"
-              class="resize-none"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage class="text-xs h-4" />
-          <FormDescription class="w-fit text-xs">
-            e.g. Pondok Indah Mall 2, Level 1 Jl. Metro Pondok Indah Blok III-B
-            Pondok Indah, Jakarta Selatan DKI Jakarta 12310 Indonesia
-          </FormDescription>
-        </FormItem>
-      </FormField>
-      <FormField v-slot="{ componentField }" name="services" class="mb-5">
-        <FormItem>
-          <FormLabel>
-            Services
-          </FormLabel>
-          <FormControl>
-            <ServiceInput v-bind="componentField" @update:services="handleServiceInput" :services="branchData!.services" />
-          </FormControl>
-          <FormDescription class="w-fit text-xs"> Services available in this branch </FormDescription>
-          <FormMessage class="text-xs h-4" />
-        </FormItem>
-      </FormField>
-      <div class="flex gap-2">
-        <FormField v-slot="{ componentField }" name="openTime">
+  <div class="w-full h-full">
+    <div class="flex items-center gap-2 py-2 h-[3rem]">
+      <Button
+        @click="
+          () => {
+            emit('update:view', 'branches');
+            branchForm.resetForm();
+          }
+        "
+        class="rounded-full w-fit h-fit ml-0 pl-0"
+        variant="ghost"
+      >
+        <ArrowLeft class="w-fit h-fit" />
+      </Button>
+      <h1 class="text-xl font-bold">Add new branch</h1>
+    </div>
+    <ScrollArea class="rounded-md w-full h-full">
+      <form @submit.prevent="onBranchFormSubmit" class="">
+        <FormField v-slot="{ componentField }" name="name">
           <FormItem>
-            <FormLabel>Open time</FormLabel>
+            <FormLabel>Branch name</FormLabel>
             <FormControl>
               <Input
                 type="text"
-                placeholder="Enter open time in 24 hour format"
+                placeholder="Enter the new branch name"
                 v-bind="componentField"
               />
             </FormControl>
-            <FormDescription class="w-fit text-xs"> eg. 09:00 </FormDescription>
+            <FormDescription class="w-fit text-xs">
+              e.g. Branch-Pondok Indah Mall II
+            </FormDescription>
             <FormMessage class="text-xs h-4" />
           </FormItem>
         </FormField>
-        <FormField v-slot="{ componentField }" name="closeTime">
+        <FormField v-slot="{ componentField }" name="address">
           <FormItem>
-            <FormLabel>Close time</FormLabel>
+            <FormLabel> Branch address </FormLabel>
             <FormControl>
-              <Input
-                type="text"
-                placeholder="Enter close time in 24 hour format"
+              <Textarea
+                placeholder="Enter the branch's address details"
+                class="resize-none"
                 v-bind="componentField"
               />
             </FormControl>
-            <FormDescription class="w-fit text-xs"> eg. 19:00 </FormDescription>
+            <FormMessage class="text-xs h-4" />
+            <FormDescription class="w-fit text-xs">
+              e.g. Pondok Indah Mall 2, Level 1 Jl. Metro Pondok Indah Blok
+              III-B Pondok Indah, Jakarta Selatan DKI Jakarta 12310 Indonesia
+            </FormDescription>
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ componentField }" name="services" class="mb-5">
+          <FormItem>
+            <FormLabel> Services </FormLabel>
+            <FormControl>
+              <ServiceInput
+                v-bind="componentField"
+                @update:services="handleServiceInput"
+                :services="branchData!.services"
+                class="w-full"
+              />
+            </FormControl>
+            <FormDescription class="w-fit text-xs">
+              Services available in this branch
+            </FormDescription>
             <FormMessage class="text-xs h-4" />
           </FormItem>
         </FormField>
-      </div>
+        <div class="flex sm:flex-row flex-col w-full gap-2">
+          <FormField v-slot="{ componentField }" name="openTime">
+            <FormItem>
+              <FormLabel>Open time</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Enter open time in 24H"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormDescription class="w-fit text-xs">
+                eg. 09:00
+              </FormDescription>
+              <FormMessage class="text-xs h-4" />
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="closeTime">
+            <FormItem>
+              <FormLabel>Close time</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Enter close time in 24H"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormDescription class="w-fit text-xs">
+                eg. 19:00
+              </FormDescription>
+              <FormMessage class="text-xs h-4" />
+            </FormItem>
+          </FormField>
+        </div>
 
-      <FormField v-slot="{ componentField }" name="lat">
-        <FormItem>
-          <FormLabel>Latitude</FormLabel>
-          <FormControl>
-            <Input
-              type="number"
-              step="any"
-              placeholder="Enter the branch latitude"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormDescription class="w-fit text-xs">
-            eg. Latitude: 7.331748
-          </FormDescription>
-          <FormMessage class="text-xs h-4" />
-        </FormItem>
-      </FormField>
-      <FormField v-slot="{ componentField }" name="lng">
-        <FormItem>
-          <FormLabel>Longitude</FormLabel>
-          <FormControl>
-            <Input
-              type="number"
-              step="any"
-              placeholder="Enter the branch longitude"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormDescription class="w-fit text-xs">
-            e.g Longitude: 26.717810
-          </FormDescription>
-          <FormMessage class="text-xs h-4" />
-        </FormItem>
-      </FormField>
-      <Separator />
-      <Toggle
-        v-model:pressed="dropPinToggle"
-        class="w-full my-2 flex gap-3"
-        @click="emit('drop-pin')"
-        variant="outline"
-      >
-        <MapPin /> Drop a pin
-      </Toggle>
-      <Button
-        type="submit"
-        :disabled="false"
-        class="w-full flex gap-3"
-        variant="outline"
-        v-if="Object.keys(branchData).length === 0"
-      >
-        <Plus /> Add new branch
-      </Button>
-      <Button
-        type="submit"
-        :disabled="false"
-        class="w-full flex gap-3"
-        variant="outline"
-        v-else
-      >
-        <Pencil /> Update branch
-      </Button>
-    </form>
-  </ScrollArea>
+        <FormField v-slot="{ componentField }" name="lat">
+          <FormItem>
+            <FormLabel>Latitude</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                step="any"
+                placeholder="Enter the branch latitude"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormDescription class="w-fit text-xs">
+              eg. Latitude: 7.331748
+            </FormDescription>
+            <FormMessage class="text-xs h-4" />
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ componentField }" name="lng">
+          <FormItem>
+            <FormLabel>Longitude</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                step="any"
+                placeholder="Enter the branch longitude"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormDescription class="w-fit text-xs">
+              e.g Longitude: 26.717810
+            </FormDescription>
+            <FormMessage class="text-xs h-4" />
+          </FormItem>
+        </FormField>
+        <Separator />
+        <Toggle
+          v-model:pressed="dropPinToggle"
+          class="w-full my-2 flex gap-3"
+          @click="emit('drop-pin')"
+          variant="outline"
+        >
+          <MapPin /> Drop a pin
+        </Toggle>
+        <Button
+          type="submit"
+          :disabled="false"
+          class="w-full flex gap-3"
+          variant="outline"
+          v-if="Object.keys(branchData).length === 0"
+        >
+          <Plus /> Add new branch
+        </Button>
+        <Button
+          type="submit"
+          :disabled="false"
+          class="w-full flex gap-3"
+          variant="outline"
+          v-else
+        >
+          <Pencil /> Update branch
+        </Button>
+      </form>
+    </ScrollArea>
+  </div>
 </template>

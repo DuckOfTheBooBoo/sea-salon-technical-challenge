@@ -69,7 +69,7 @@ const deleteBranchMethod = async (branch: BranchType) => {
     <p class="text-lg font-semibold">Branches</p>
     <Separator />
 
-    <ScrollArea class="rounded-md px-2 py-1 h-[520px]">
+    <ScrollArea class="rounded-md px-2 py-1 h-full sm:h-[520px]">
       <Accordion type="single" class="w-full" collapsible>
         <AccordionItem
           v-for="branch in branches"

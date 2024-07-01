@@ -135,7 +135,7 @@ const handleBlur = () => {
 };
 </script>
 <template>
-  <div class="flex gap-2 mb-5">
+  <div class="flex flex-col sm:flex-row gap-2 mb-5">
     <TagsInput class="px-0 gap-0 w-80" :model-value="modelValue">
       <div class="flex gap-2 flex-wrap items-center px-3">
         <TagsInputItem v-for="item in modelValue" :key="item" :value="item">
@@ -195,12 +195,15 @@ const handleBlur = () => {
       </ComboboxRoot>
     </TagsInput>
 
-    <Dialog v-model:open="isServiceFormOpen">
+    <Dialog v-model:open="isServiceFormOpen" class="my-2">
       <DialogTrigger as-child>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger as-child>
-              <Button variant="outline" class="h-full" @click="isServiceFormOpen = true"><Plus /></Button>
+              <Button variant="ghost" class="h-full" @click="isServiceFormOpen = true">
+                <Plus />
+                <span class="sm:hidden">Add new service</span>
+              </Button>
             </TooltipTrigger>
             <TooltipContent>
               <p>Add new service</p>
@@ -214,7 +217,7 @@ const handleBlur = () => {
         </DialogHeader>
         <form @submit.prevent="onSubmit">
           <FormField v-slot="{ componentField }" name="serviceName">
-            <FormItem>
+            <FormItem v-auto-animate>
               <FormLabel>Service name</FormLabel>
               <FormControl>
                 <Input
@@ -227,7 +230,7 @@ const handleBlur = () => {
             </FormItem>
           </FormField>
           <FormField v-slot="{ componentField }" name="duration">
-            <FormItem>
+            <FormItem v-auto-animate>
               <FormLabel>Duration</FormLabel>
               <FormControl>
                 <Input
