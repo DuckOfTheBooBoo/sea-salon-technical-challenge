@@ -13,6 +13,7 @@
     # pkgs.nodePackages.nodemon
     pkgs.go
     pkgs.bun
+    pkgs.compile-daemon
   ];
 
   # Sets environment variables in the workspace
