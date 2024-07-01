@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-    <div class="flex flex-col rounded-xl border overflow-hidden w-[360px] shadow-xl hover:translate-y-[-1rem] transition-all">
+    <div class="flex flex-col rounded-xl border overflow-hidden min-w-60 max-w-96 shadow-xl hover:translate-y-[-1rem] transition-all">
         <img v-if="!src2" :src="src" alt="" class="w-full h-96 object-cover">
         <div v-else class="flex">
             <img class="w-1/2 h-96 object-cover" :src="src" alt="">
