@@ -10,5 +10,4 @@ type User struct {
 	Password     string        `gorm:"not null" json:"-"`
 	Role         string        `gorm:"not null" json:"role"`
 	Reservations []Reservation `gorm:"foreignKey:UserID" json:"-"`
-	Reviews      []Review      `gorm:"foreignKey:UserID" json:"-"`
 }
