@@ -2,11 +2,10 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -224,32 +223,30 @@ const deleteReservationMethod = async (reservation: Reservation) => {
 </script>
 
 <template>
-  <Card class="w-full">
+  <Card class="w-full max-w-screen-md h-full">
     <CardHeader>
-      <CardTitle>Your reservations</CardTitle>
-      <CardDescription></CardDescription>
+      <CardTitle class="text-center">Your reservations</CardTitle>
     </CardHeader>
-    <CardContent>
-
-      <ScrollArea class="h-full sm:h-[200px] w-full rounded-md border px-2">
+    <CardContent class="h-full">
+      <ScrollArea class="h-[90%] w-full rounded-md">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead class="w-fit text-xs sm:text-base">Branch</TableHead>
               <TableHead class="text-xs sm:text-base">Date & Time</TableHead>
               <TableHead class="text-xs sm:text-base">Service</TableHead>
-              <TableHead class="text-center text-xs sm:text-base"> Action </TableHead>
+              <TableHead class="text-center text-xs sm:text-base">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow v-for="reservation in reservations" :key="reservation.ID">
-              <TableCell>{{
+              <TableCell class="text-xs sm:text-base">{{
                 branches.find((b) => b.ID === reservation.branch_id)
                   ?.branch_name
               }}</TableCell>
-              <TableCell>{{ parseToLocalDateTime(reservation.date).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) }}</TableCell>
+              <TableCell class="text-wrap text-xs sm:text-base">{{ parseToLocalDateTime(reservation.date).toLocaleString('id-ID', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false }) }}</TableCell>
               <TableCell>{{ reservation.service }}</TableCell>
-              <TableCell class="flex justify-center">
+              <TableCell class="">
                 <AlertDialog>
                   <AlertDialogTrigger as-child>
                     <Button
@@ -283,170 +280,171 @@ const deleteReservationMethod = async (reservation: Reservation) => {
             </TableRow>
           </TableBody>
         </Table>
+        <ScrollBar orientation="horizontal" />
       </ScrollArea>
 
-      <Dialog v-model:open="isReservationFormOpen">
-          <DialogTrigger as-child>
-            <Button variant="outline" class="w-full">Make reservation</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <form @submit.prevent="onReservationSubmit">
-              <DialogHeader>
-                <DialogTitle>Reservation Form</DialogTitle>
-              </DialogHeader>
-              <FormField v-slot="{ componentField }" name="branch">
-                <FormItem>
-                  <FormLabel>Branch</FormLabel>
-                  <Select v-bind="componentField">
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a branch" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem
-                        v-for="branch in branches"
-                        :value="branch.branch_name"
-                      >
-                        {{ branch.branch_name }}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription
-                    >This will be the service you want to
-                    reserve.</FormDescription
-                  >
-                  <FormMessage class="text-xs h-4" />
-                </FormItem>
-              </FormField>
-              <FormField v-slot="{ componentField }" name="service">
-                <FormItem>
-                  <FormLabel>Service type</FormLabel>
-                  <Select
-                    v-bind="componentField"
-                    :disabled="services.length === 0"
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a service" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Services</SelectLabel>
-                        <SelectItem
-                          v-for="service in services"
-                          :value="service.service_name"
-                        >
-                          {{ service.service_name }}
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription
-                    >This will be the service you want to
-                    reserve.</FormDescription
-                  >
-                  <FormMessage class="text-xs h-4" />
-                </FormItem>
-              </FormField>
-              <div class="flex">
-                <!-- DATE -->
-                <FormField name="date">
-                  <FormItem>
-                    <FormLabel>Reservation date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger as-child>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            :class="
-                              cn(
-                                'w-[240px] ps-3 text-start font-normal',
-                                !dateValue && 'text-muted-foreground'
-                              )
-                            "
-                          >
-                            <span>{{
-                              dateValue
-                                ? df.format(toDate(dateValue))
-                                : "Pick a date"
-                            }}</span>
-                            <CalendarIcon class="ms-auto h-4 w-4 opacity-50" />
-                          </Button>
-                          <input hidden />
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent class="w-auto p-0">
-                        <Calendar
-                          v-model:placeholder="placeholder"
-                          v-model="dateValue"
-                          calendar-label="Reservation Date"
-                          initial-focus
-                          :min-value="today(getLocalTimeZone())"
-                          @update:model-value="
-                            (v) => {
-                              if (v) {
-                                reservationForm.setFieldValue(
-                                  'date',
-                                  v.toString()
-                                );
-                              } else {
-                                reservationForm.setFieldValue(
-                                  'date',
-                                  undefined
-                                );
-                              }
-                            }
-                          "
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormDescription class="w-fit"
-                      >This will be your reservation date.</FormDescription
-                    >
-                    <FormMessage class="text-xs h-4" />
-                  </FormItem>
-                </FormField>
-
-                <!-- TIME -->
-                <FormField v-slot="{ componentField }" name="time">
-                  <FormItem>
-                    <FormLabel>Time</FormLabel>
-                    <Select
-                      v-bind="componentField"
-                      :disabled="!reservationForm.values.service"
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select time" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectItem
-                            v-for="hour in availableTime"
-                            :value="`${hour}`"
-                            :key="hour"
-                          >
-                            {{ hour }}
-                          </SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription
-                      >Each reservation is one hour long.</FormDescription
-                    >
-                    <FormMessage class="text-xs h-4" />
-                  </FormItem>
-                </FormField>
-              </div>
-              <DialogFooter>
-                <Button type="submit">Submit</Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
     </CardContent>
   </Card>
+  <Dialog v-model:open="isReservationFormOpen">
+      <DialogTrigger as-child>
+        <Button variant="outline" class="w-full mt-4 max-w-screen-sm bg-primary text-white">Make reservation</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <form @submit.prevent="onReservationSubmit">
+          <DialogHeader>
+            <DialogTitle>Reservation Form</DialogTitle>
+          </DialogHeader>
+          <FormField v-slot="{ componentField }" name="branch">
+            <FormItem v-auto-animate>
+              <FormLabel>Branch</FormLabel>
+              <Select v-bind="componentField">
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a branch" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem
+                    v-for="branch in branches"
+                    :value="branch.branch_name"
+                  >
+                    {{ branch.branch_name }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription
+                >This will be the service you want to
+                reserve.</FormDescription
+              >
+              <FormMessage class="text-xs h-4" />
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="service">
+            <FormItem v-auto-animate>
+              <FormLabel>Service type</FormLabel>
+              <Select
+                v-bind="componentField"
+                :disabled="services.length === 0"
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a service" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Services</SelectLabel>
+                    <SelectItem
+                      v-for="service in services"
+                      :value="service.service_name"
+                    >
+                      {{ service.service_name }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <FormDescription
+                >This will be the service you want to
+                reserve.</FormDescription
+              >
+              <FormMessage class="text-xs h-4" />
+            </FormItem>
+          </FormField>
+          <div class="flex sm:flex-row flex-col sm:justify-between">
+            <!-- DATE -->
+            <FormField name="date" class="w-full">
+              <FormItem v-auto-animate>
+                <FormLabel>Reservation date</FormLabel>
+                <Popover>
+                  <PopoverTrigger as-child>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        :class="
+                          cn(
+                            'w-[240px] ps-3 text-start font-normal w-full',
+                            !dateValue && 'text-muted-foreground'
+                          )
+                        "
+                      >
+                        <span>{{
+                          dateValue
+                            ? df.format(toDate(dateValue))
+                            : "Pick a date"
+                        }}</span>
+                        <CalendarIcon class="ms-auto h-4 w-4 opacity-50" />
+                      </Button>
+                      <input hidden />
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent class="w-auto p-0">
+                    <Calendar
+                      v-model:placeholder="placeholder"
+                      v-model="dateValue"
+                      calendar-label="Reservation Date"
+                      initial-focus
+                      :min-value="today(getLocalTimeZone())"
+                      @update:model-value="
+                        (v) => {
+                          if (v) {
+                            reservationForm.setFieldValue(
+                              'date',
+                              v.toString()
+                            );
+                          } else {
+                            reservationForm.setFieldValue(
+                              'date',
+                              undefined
+                            );
+                          }
+                        }
+                      "
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormDescription class="w-fit"
+                  >This will be your reservation date.</FormDescription
+                >
+                <FormMessage class="text-xs h-4" />
+              </FormItem>
+            </FormField>
+
+            <!-- TIME -->
+            <FormField v-slot="{ componentField }" name="time" class="w-full">
+              <FormItem v-auto-animate>
+                <FormLabel>Time</FormLabel>
+                <Select
+                  v-bind="componentField"
+                  :disabled="!reservationForm.values.service"
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select time" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="hour in availableTime"
+                        :value="`${hour}`"
+                        :key="hour"
+                      >
+                        {{ hour }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormDescription
+                  >Your reservation time.</FormDescription
+                >
+                <FormMessage class="text-xs h-4" />
+              </FormItem>
+            </FormField>
+          </div>
+          <DialogFooter>
+            <Button type="submit" class="mt-4">Submit</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+  </Dialog>
 </template>
