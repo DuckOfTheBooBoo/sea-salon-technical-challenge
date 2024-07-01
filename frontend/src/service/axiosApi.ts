@@ -21,7 +21,6 @@ apiClient.interceptors.request.use((config) => {
 }, (error) => Promise.reject(error));
 
 apiClient.interceptors.response.use((response: AxiosResponse) => {
-    console.log(response)
     return response;
 }, (error) => {
     const err: AxiosError = error as AxiosError;

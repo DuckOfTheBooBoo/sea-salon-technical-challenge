@@ -5,7 +5,6 @@ import SignUpPage from '@/views/auth/SignUpPage.vue';
 import AdminDashboard from '@/views/admin/Dashboard.vue';
 import CustomerDashboard from '@/views/customer/Dashboard.vue';
 import ForbiddenPage from '@/views/ForbiddenPage.vue';
-import NotFoundPage from '@/views/NotFoundPage.vue';
 import type { JWTPayload } from '@/types';
 import { jwtDecode } from 'jwt-decode';
 
@@ -42,19 +41,13 @@ const routes: RouteRecordRaw[] = [
         name: 'forbidden',
         component: ForbiddenPage
     },
-    {
-      path: '/:catchAll(.*)',
-      name: 'not-found',
-      component: NotFoundPage
-    }
 ]
 
 const router = createRouter({ history: createWebHistory(), routes });
 
 router.beforeEach(async (to, from, next) => {
-  console.log(to, from);
 
-  // Allow navigation if hash is present or route is 'landing'
+  // Allow navigation if hash is present (this only happens in landing page) or route is 'landing' 
   if (to.hash !== "" || from.hash !== "" || to.name === 'landing') {
     next();
     return;
