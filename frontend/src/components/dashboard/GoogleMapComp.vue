@@ -15,7 +15,7 @@ const props = defineProps<{
 
 const zoom: Ref<number> = ref(12);
 let clickListener: any = null;
-const API_KEY: string = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const API_KEY: string = 'AIzaSyBlqsn0PcSVEckwY85-9ZxCXK-tJEHUm7c'; // Hapus setelah pengumuman tahap 1, bismillah :D
 const emit = defineEmits<{
   (e: "update:location", location: Coordinate): void;
 }>();
