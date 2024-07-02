@@ -3,7 +3,7 @@ import * as constants from '@/constants';
 import router from '@/router';
 
 const apiClient: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:3000/api',
+    baseURL: `/api`,
     headers: {
         'Content-Type': 'application/json',
     },
