@@ -2,6 +2,8 @@ const animate = require("tailwindcss-animate")
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  plugins: [animate],
+  important: true,
   darkMode: ["class"],
   safelist: ["dark"],
   prefix: "",
@@ -20,6 +22,10 @@ module.exports = {
       screens: {
         "2xl": "1400px",
       },
+    },
+    fontFamily: {
+      sans: ['"Inter"', 'sans-serif'],
+      oleragie: ['"Oleragie"', 'sans-serif'],
     },
     extend: {
       colors: {

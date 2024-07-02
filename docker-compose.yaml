@@ -1,0 +1,29 @@
+name: sea-salon
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password # change this
+      MYSQL_DATABASE: sea_salon
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DB_NAME: sea_salon
+      DB_USER: root
+      DB_PASS: password # change this
+      DB_HOST: db
+      MAX_RETRIES: 10
+      RETRY_DELAY: 10
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    

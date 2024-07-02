@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
+import Toaster from "@/components/ui/toast/Toaster.vue";
 </script>
 
 <template>
-  <Button>Hai</Button>
+  <Toaster />
+  
+  <main>
+    <RouterView />
+  </main>
 </template>
 
 <style scoped></style>
