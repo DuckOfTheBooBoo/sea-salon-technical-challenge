@@ -5,6 +5,10 @@ import { useToast } from "@/components/ui/toast/use-toast";
 import LandingHeader from "@/components/landingPage/Header.vue";
 import LandingTestimonial from "@/components/landingPage/Testimonial.vue";
 import { Ref, ref } from "vue";
+import HaircutImg from '@/assets/images/haircut-img-comp.webp'
+import ManicureImg from '@/assets/images/manicure-img-comp.webp'
+import PedicureImg from '@/assets/images/pedicure-img-comp.webp'
+import FacialImg from '@/assets/images/facial-img-comp.webp'
 
 interface Service {
   src: string;
@@ -28,21 +32,21 @@ const options = {
 // Service list
 const services: Service[] = [
   {
-    src: "src/assets/images/haircut-img-comp.webp",
+    src: HaircutImg,
     src2: undefined,
     title: "Haircut",
     description:
       "Expert cuts that flatter you. Effortless style for every occasion.",
   },
   {
-    src: "src/assets/images/manicure-img-comp.webp",
-    src2: "src/assets/images/pedicure-img-comp.webp",
+    src: ManicureImg,
+    src2: PedicureImg,
     title: "Manicure & Pedicure",
     description:
       "Indulge in luxurious manicures & pedicures. Flawless polish, lasting confidence.",
   },
   {
-    src: "src/assets/images/facial-img-comp.webp",
+    src: FacialImg,
     src2: undefined,
     title: "Facial Treatment",
     description:
