@@ -30,6 +30,7 @@ func ConnectToDB() (Database, error) {
 	dbUser := os.Getenv("DB_USER")
 	dbPass := os.Getenv("DB_PASS")
 	retries := os.Getenv("MAX_RETRIES")
+	retryDel := os.Getenv("RETRY_DELAY")
 
 	log.Println("DB_NAME:", os.Getenv("DB_NAME"))
 	log.Println("DB_HOST:", os.Getenv("DB_HOST"))
@@ -41,8 +42,13 @@ func ConnectToDB() (Database, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	retryDelay := 5 * time.Second
+	
+	retryDelay, err := strconv.Atoi(retryDel)
+	if err != nil {
+		return nil, err
+	}
+	
+	retryTime := time.Duration(retryDelay) * time.Second
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbName)
 	
@@ -54,7 +60,7 @@ func ConnectToDB() (Database, error) {
 		}
 
 		log.Printf("Failed to connect to database: %v. Retrying in %v...", err, retryDelay)
-		time.Sleep(retryDelay)
+		time.Sleep(retryTime)
 	}
 
 	// Return the last error if all retries fail
