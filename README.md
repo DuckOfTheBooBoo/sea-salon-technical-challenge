@@ -75,7 +75,7 @@ docker compose logs -f
 Monitor the logs to ensure all services start correctly:
 - Wait for the backend service to successfully connect to the database. This may take a few moments as MySQL needs time to initialize.
 
-- Look for the log entry [GIN-debug] Listening and serving HTTP on :3000. This indicates that the backend service is running successfully.
+- Look for the log entry `[GIN-debug] Listening and serving HTTP on :3000`. This indicates that the backend service is running successfully.
 
 5. Access the application
 
