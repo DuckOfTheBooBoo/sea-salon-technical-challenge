@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/DuckOfTheBooBoo/sea-salon-technical-challenge/backend/configs"
@@ -97,28 +100,28 @@ func createBranches(gormDB *gorm.DB) {
 
 	var branches []models.Branch = []models.Branch{
 		{
-			BranchName: "SEA Salon - Pondok Indah Mall II",
+			BranchName:    "SEA Salon - Pondok Indah Mall II",
 			BranchAddress: "Pondok Indah Mall 2, Level 1 Jl. Metro Pondok Indah Blok III-B Pondok Indah, Jakarta Selatan DKI Jakarta 12310 Indonesia",
-			Lat: -6.264692675855703,
-			Lng: 106.78453850564463,
-			OpenAt: intTimeParser("09:00"),
-			ClosedAt: intTimeParser("20:00"),
+			Lat:           -6.264692675855703,
+			Lng:           106.78453850564463,
+			OpenAt:        intTimeParser("09:00"),
+			ClosedAt:      intTimeParser("20:00"),
 		},
 		{
-			BranchName: "SEA Salon - Cilandak Town Square",
+			BranchName:    "SEA Salon - Cilandak Town Square",
 			BranchAddress: "Jl. Cilandak No. 1, Cilandak, Jakarta Selatan 12430, Indonesia",
-			Lat: -6.291703706041596,
-			Lng: 106.79988239264421,
-			OpenAt: intTimeParser("10:00"),
-			ClosedAt: intTimeParser("21:00"),
+			Lat:           -6.291703706041596,
+			Lng:           106.79988239264421,
+			OpenAt:        intTimeParser("10:00"),
+			ClosedAt:      intTimeParser("21:00"),
 		},
 		{
-			BranchName: "SEA Salon - Plaza Blok M",
+			BranchName:    "SEA Salon - Plaza Blok M",
 			BranchAddress: "Plaza Bl. M, Blok M Plaza, Lantai 2, Jl. Bulungan No.76, RT.6/RW.6, Kramat Pela, Kebayoran Baru, South Jakarta City, Jakarta 12130",
-			Lat: -6.244134189991264,
-			Lng: 106.7975735709911,
-			OpenAt: intTimeParser("10:00"),
-			ClosedAt: intTimeParser("22:00"),
+			Lat:           -6.244134189991264,
+			Lng:           106.7975735709911,
+			OpenAt:        intTimeParser("10:00"),
+			ClosedAt:      intTimeParser("22:00"),
 		},
 	}
 
@@ -210,7 +213,59 @@ func createReviews(gormDB *gorm.DB) {
 	log.Print("Reviews created successfully")
 }
 
-func main() {
+func setMigrated() {
+	data, err := os.ReadFile("status.json")
+
+	if err != nil {
+		panic(err)
+	}
+
+	var statusMap map[string]bool
+	if err := json.Unmarshal(data, &statusMap); err != nil {
+		panic(err)
+	}
+
+	_, ok := statusMap["is_migrated"]
+	if !ok {
+		fmt.Println("Key 'is_migrated' not found. Creating new key.")
+		statusMap["is_migrated"] = false
+	} else {
+		statusMap["is_migrated"] = true
+	}
+
+	jsonDataBytes, err := json.Marshal(statusMap)
+	if err != nil {
+		panic(err)
+	}
+
+	if err := os.WriteFile("status.json", jsonDataBytes, 0644); err != nil {
+		panic(err)
+	}
+}
+
+func isMigratedCheck() bool {
+	data, err := os.ReadFile("status.json")
+
+	if err != nil {
+		panic(err)
+	}
+
+	var statusMap map[string]bool
+	if err := json.Unmarshal(data, &statusMap); err != nil {
+		panic(err)
+	}
+
+	_, ok := statusMap["is_migrated"]
+	if !ok {
+		fmt.Println("Key 'is_migrated' not found. Creating new key.")
+		statusMap["is_migrated"] = false
+		return false
+	}
+
+	return statusMap["is_migrated"]
+}
+
+func migrate() {
 
 	db, err := configs.ConnectToDB()
 

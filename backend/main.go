@@ -16,6 +16,13 @@ func init() {
 }
 
 func main() {
+	if !isMigratedCheck() {
+		migrate()
+		setMigrated()
+	} else {
+		log.Print("Database is already migrated")
+	}
+
 	r := gin.Default()
 
 	// Set up database connection
