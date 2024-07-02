@@ -46,8 +46,8 @@ services:
       DB_USER: root
       DB_PASS: password # change this
       DB_HOST: db
-      MAX_RETRIES: 10
-      RETRY_DELAY: 10
+      MAX_RETRIES: 10 # attempts to connect to database on startup
+      RETRY_DELAY: 10 # seconds before retrying
     depends_on:
       - db
 
@@ -83,7 +83,7 @@ Open your web browser and navigate to http://localhost:8080 (or your desired por
 
 
 ### NOTE
-- If the backend logs show connect: connection refused, it means the backend is trying to connect to the database before it is ready. The backend will retry connecting based on the MAX_RETRIES and RETRY_DELAY environment variables.
+- If the backend logs show `connect: connection refused`, it means the backend is trying to connect to the database before it is ready. The backend will retry connecting based on the MAX_RETRIES and RETRY_DELAY environment variables.
 
 - Ensure that the docker-compose.yaml file has the correct credentials and configurations as per your setup requirements.
 
