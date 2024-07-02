@@ -87,7 +87,7 @@ Open your web browser and navigate to http://localhost:8080 (or your desired por
 
 - Ensure that the docker-compose.yaml file has the correct credentials and configurations as per your setup requirements.
 
-- Additionally, if the backend stop retrying after the amount of attempts has reached, you could just restart the container, the name usually goes by `sea-salon-backend-1`
+- Additionally, if the backend stop retrying after the amount of attempts has reached, you could just restart the container, the name usually goes by `sea-salon-backend-1` (kindly check your container's name `docker ps -a`!)
 ```bash
 docker container restart sea-salon-backend-1
 ```
