@@ -2,8 +2,6 @@ name: sea-salon
 services:
   db:
     image: mysql
-      #    ports:
-      #      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: password # change this
       MYSQL_DATABASE: sea_salon
@@ -12,8 +10,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-        #ports:
-        #- "3000:3000"
     environment:
       DB_NAME: sea_salon
       DB_USER: root
