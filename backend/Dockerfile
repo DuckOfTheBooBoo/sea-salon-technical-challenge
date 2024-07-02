@@ -19,6 +19,7 @@ ENV DB_PASS=password
 ENV DB_HOST=127.0.0.1
 ENV MAX_RETRIES=5
 ENV RETRY_DELAY=10
+ENV TOKEN_SECRET=DoooDooDaDoo
 
 # Copy the rest of the application code
 COPY . .
