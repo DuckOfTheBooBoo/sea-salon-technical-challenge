@@ -1,4 +1,4 @@
-import { createWebHistory, createRouter, type RouteRecordRaw, type RouteLocationNormalized, type NavigationGuardNext } from 'vue-router';
+import { createWebHistory, createRouter, type RouteRecordRaw } from 'vue-router';
 import LandingPage from '@/views/LandingPage.vue';
 import Login from '@/views/auth/LoginPage.vue';
 import SignUpPage from '@/views/auth/SignUpPage.vue';

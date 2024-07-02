@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import * as z from "zod";
-import {SignUpRequest, SignUpResponse} from "@/types";
+import { SignUpRequest } from "@/types";
 import { addNewUser } from "@/service/userApi";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { AuthError } from "@/errors/auth";
@@ -79,7 +79,7 @@ const onSignUpSubmit = signUpForm.handleSubmit(async (values) => {
   };
 
   try {
-    const response: SignUpResponse = await addNewUser(request);
+    await addNewUser(request);
     router.push({ name: "login" });
   } catch (error: unknown) {
     const err: AuthError = error as AuthError;

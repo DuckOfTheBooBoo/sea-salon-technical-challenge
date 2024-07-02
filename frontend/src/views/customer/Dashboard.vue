@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Calendar } from "@/components/ui/calendar";
 import ReservationList from "@/components/dashboard/ReservationList.vue";
 import { ref, type Ref, onMounted } from "vue";
 import {type Branch} from "@/types";

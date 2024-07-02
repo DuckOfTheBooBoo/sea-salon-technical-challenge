@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, type AxiosResponse, type AxiosError } from 'axios';
+import axios, { type AxiosInstance, type AxiosResponse, type AxiosRequestHeaders, type AxiosError } from 'axios';
 import * as constants from '@/constants';
 import router from '@/router';
 
@@ -15,7 +15,7 @@ apiClient.interceptors.request.use((config) => {
         config.headers = {
             ...config.headers,
             Authorization: `Bearer ${token}`,
-        };
+        } as AxiosRequestHeaders;
     }
     return config;
 }, (error) => Promise.reject(error));

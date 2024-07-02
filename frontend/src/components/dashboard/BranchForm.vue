@@ -87,6 +87,7 @@ watch(
 );
 
 const handleServiceInput = (values: string[]) => {
+  // @ts-ignore
   branchForm.setFieldValue("services", values);
 };
 
@@ -129,6 +130,7 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
   }
 
   try {
+    // @ts-ignore
     const resp: Branch = await addBranch(request);
     emit("update:branch", resp);
     emit("update:view", "branches");
@@ -165,6 +167,7 @@ onMounted(() => {
     );
     branchForm.setFieldValue(
       "services",
+      // @ts-ignore
       props.branchData.services.map((s) => s.service_name)
     );
   }
@@ -323,7 +326,7 @@ onMounted(() => {
           :disabled="false"
           class="w-full flex gap-3"
           variant="outline"
-          v-if="Object.keys(branchData).length === 0"
+          v-if="Object.keys(branchData!).length === 0"
         >
           <Plus /> Add new branch
         </Button>

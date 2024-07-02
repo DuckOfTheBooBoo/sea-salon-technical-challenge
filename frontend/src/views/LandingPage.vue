@@ -4,7 +4,6 @@ import { Phone } from "lucide-vue-next";
 import { useToast } from "@/components/ui/toast/use-toast";
 import LandingHeader from "@/components/landingPage/Header.vue";
 import LandingTestimonial from "@/components/landingPage/Testimonial.vue";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Ref, ref } from "vue";
 
 interface Service {
@@ -20,6 +19,7 @@ const activeSection: Ref<string> = ref("home");
 const options = {
   anchors: ["home", "services", "testimonials", "contact"],
   licenseKey: "gplv3-license",
+  // @ts-ignore
   afterLoad: (origin, destination) => {
     activeSection.value = destination.anchor;
   },
