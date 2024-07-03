@@ -87,9 +87,13 @@ watch(modelValue.value, () => {
 });
 
 const onSubmit = serviceForm.handleSubmit(async (values) => {
+  let normalized_string = values.serviceName.toLowerCase();
+  normalized_string = normalized_string.replace(/[^a-z0-9\s]/g, ' ');
+  normalized_string = normalized_string.replace(/\s+/g, '-').trim().replace(/-{2,}/g, '-');
+  
   const request: Service = {
     service_name: values.serviceName,
-    service_code: values.serviceName.replace(" ", "-").toLowerCase(),
+    service_code: normalized_string,
     duration: values.duration,
   };
 

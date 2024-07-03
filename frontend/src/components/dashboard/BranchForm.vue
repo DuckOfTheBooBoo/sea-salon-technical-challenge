@@ -99,9 +99,12 @@ const onBranchFormSubmit = branchForm.handleSubmit(async (values) => {
     lng: values.lng,
     open_time: values.openTime,
     close_time: values.closeTime,
-    services: values.services.map((service: string) =>
-      service.replace(" ", "-").toLowerCase()
-    ),
+    services: values.services.map((service: string) => {
+      let normalized_string = service.toLowerCase();
+      normalized_string = normalized_string.replace(/[^a-z0-9\s]/g, ' ');
+      normalized_string = normalized_string.replace(/\s+/g, '-').trim().replace(/-{2,}/g, '-');
+      return normalized_string.replace(/\s+/g, '-').replace(/\s/g, '-');
+    }),
   };
 
   // Update
