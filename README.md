@@ -91,3 +91,4 @@ Open your web browser and navigate to http://localhost:8080 (or your desired por
 ```bash
 docker container restart sea-salon-backend-1
 ```
+- If you see the message `could not connect to database after 10 attempts: <nil>`, that means the backend failed to connect with the database based on MAX_RETRIES, consider increasing the amount of attempts.
