@@ -61,7 +61,7 @@ services:
 
 3. Build and run the container
 
-Use Docker Compose to build and run the conainers in detached mode.
+Use Docker Compose to build and run the containers in detached mode.
 ```bash
 docker compose up -d
 ```
