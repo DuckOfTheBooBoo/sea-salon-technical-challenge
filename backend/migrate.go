@@ -54,12 +54,12 @@ func createServices(gormDB *gorm.DB) {
 		},
 		{
 			ServiceName: "Manicures & Pedicures",
-			ServiceCode: "manipedi",
+			ServiceCode: "manicures-pedicures",
 			Duration:    40,
 		},
 		{
 			ServiceName: "Facial Treatment",
-			ServiceCode: "facial",
+			ServiceCode: "facial-treatment",
 			Duration:    20,
 		},
 		{
@@ -69,7 +69,7 @@ func createServices(gormDB *gorm.DB) {
 		},
 		{
 			ServiceName: "Scalp Treatments",
-			ServiceCode: "scalp-treat",
+			ServiceCode: "scalp-treatments",
 			Duration:    35,
 		},
 	}
@@ -285,4 +285,6 @@ func migrate() {
 	createServices(gormDB)
 	createBranches(gormDB)
 	createReviews(gormDB)
+
+	setMigrated()
 }
